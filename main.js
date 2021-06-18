@@ -1,4 +1,16 @@
 //constants
+
+class PlayedSquare {
+  constructor(id, team) {
+    this.id = id;
+    this.team = team;
+    this.left = [this.id];
+    this.up = [this.id];
+    this.upleft = [this.id];
+    this.downleft = [this.id];
+  }
+}
+
 const teamColors = ["red", "blue", "yellow", "purple", "green", "orange"];
 const dice = {
   die1: [0, 0, 0, 0, 1, 0, 0, 0, 0],
@@ -9,12 +21,15 @@ const dice = {
   die6: [1, 1, 1, 0, 0, 0, 1, 1, 1],
 };
 
+const playedNumbers = {};
+
+const directions = ["left", "up", "upleft", "downleft"];
+
 //state variables
-let numOfTeams, turn;
+let numOfTeams, turn, updatedConnected, isAWinner;
 
 //cache elements
 const diceBox = document.querySelector("#dice");
-
 
 //event listeners
 document
@@ -23,30 +38,36 @@ document
 
 //functions
 function initialize() {
-    turn = 0;
-    const entryBox = document.createElement('input');
-    entryBox.setAttribute('id','entryBox');
-    document.querySelector('#entry').appendChild(entryBox)
-    render()
+  turn = 0;
+  const entryBox = document.createElement("input");
+  entryBox.setAttribute("id", "entryBox");
+  document.querySelector("#entry").appendChild(entryBox);
+  const confirm = document.createElement("button");
+  confirm.textContent = "Confirm";
+  confirm.setAttribute("id", "confirmButton");
+  confirm.addEventListener("click", numberConfirm);
+  document.querySelector("#entry").appendChild(confirm);
+  render();
+  makeBoard();
 }
 //init function
 
 function pregameRender() {
-  let n = document.querySelector("#numberOfTeams").value;
-  document.querySelector("#teamCount").textContent = n;
+  let numberOfTeams = document.querySelector("#numberOfTeams").value;
+  document.querySelector("#teamCount").textContent = numberOfTeams;
   document.querySelector("#numberOfTeams").oninput = function () {
-    n = this.value;
-    document.getElementById("teamCount").innerHTML = n;
+    numberOfTeams = this.value;
+    document.getElementById("teamCount").innerHTML = numberOfTeams;
   };
 }
 
 //render function
 function render() {
+  diceBox.innerHTML = "";
   for (let i = 1; i <= 4; i++) {
     let num = makeDie(rollDie());
     diceBox.appendChild(num);
   }
-  makeBoard();
 }
 
 function makeDie(num) {
@@ -65,6 +86,7 @@ function rollDie() {
 }
 
 function makeBoard() {
+  document.querySelector("#futureBoard").innerHTML = "";
   let board = document.createElement("div");
   board.setAttribute("id", "board");
   for (i = 0; i < 10; i++) {
@@ -76,14 +98,80 @@ function makeBoard() {
       board.appendChild(box);
     }
   }
-  document.querySelector('#futureBoard').appendChild(board);
+  document.querySelector("#futureBoard").appendChild(board);
 }
 
 function teamConfirm() {
   numOfTeams = document.querySelector("#numberOfTeams").value;
   document.body.removeChild(document.querySelector("#pregame"));
-  console.log(numOfTeams);
   initialize();
+}
+
+function numberConfirm() {
+  let inputNumber = document.querySelector("#entryBox").value;
+  if (
+    inputNumber % 1 === 0 &&
+    inputNumber > 0 &&
+    inputNumber < 101 &&
+    !Object.keys(playedNumbers).includes(`#box${inputNumber}`)
+  ) {
+    let played = new PlayedSquare(`#box${inputNumber}`, turn % numOfTeams);
+    playedNumbers[played.id] = played;
+    document.querySelector(`#box${inputNumber}`).style.backgroundColor =
+      teamColors[turn % numOfTeams];
+    update(inputNumber);
+    if (checkWin(inputNumber)){
+        return document.body.innerHTML=''
+    }
+    turn++;
+    render();
+  }
+  document.querySelector("#entryBox").value = "";
+}
+
+function updateDirection(id, distance, direction, possibleCallback) {
+  if (
+    possibleCallback(id) &&
+    (!!playedNumbers[`#box${parseInt(id) + distance}`]
+      ? playedNumbers[`#box${parseInt(id) + distance}`].team === turn % numOfTeams
+      : false)
+  ) {
+    updatedConnected = playedNumbers[`#box${id}`][direction].concat(
+      playedNumbers[`#box${parseInt(id) +distance}`][direction]
+    );
+    playedNumbers[`#box${id}`][direction] = updatedConnected;
+    for (let playedId of playedNumbers[`#box${parseInt(id) + distance}`][direction]) {
+      playedNumbers[playedId][direction] = updatedConnected;
+    }
+  }
+}
+
+function update(id) {
+  //Check up:
+  updateDirection(id, -10, "up", (x) => x > 10);
+  //Check up:
+  updateDirection(id, 10, "up", (x) => x < 91);
+  //Check left:
+  updateDirection(id, -1, "left", (x) => x % 10 !== 1);
+  //Check right:
+  updateDirection(id, 1, "left", (x) => x % 10 !== 0);
+  //Check up-left diagonal:
+  updateDirection(id, -11, "upleft", (x) => x % 10 !== 1 && x > 10);
+  //Check down-right diagonal:
+  updateDirection(id, 11, "upleft", (x) => x % 10 !== 0 && x > 10);
+  //Check down-left diagonal:
+  updateDirection(id, 9, "downleft", (x) => x % 10 !== 1 && x < 91);
+  //Check up-right diagonal:
+  updateDirection(id, -9, "downleft", (x) => x % 10 !== 0 && x < 91);
+}
+
+function checkWin(id) {
+    for (let point of directions){
+    if (playedNumbers[`#box${id}`][point].length >= 4) {
+      return true;
+    }
+  }
+  return false;
 }
 
 ////// TEST
