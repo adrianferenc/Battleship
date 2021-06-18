@@ -1,19 +1,19 @@
 body {
-    display: grid;
-    justify-content: center;
+  display: grid;
+  justify-content: center;
 }
 
 #header {
-    display: grid;
-    grid-template-columns: 100px auto;
+  display: grid;
+  grid-template-columns: 100px auto 100px;
 }
 
 #colors {
-    display:flexbox;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: auto;
+  display: flexbox;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
 }
 
 #dice {
@@ -49,4 +49,3 @@ body {
   font-size: 32pt;
   align-items: center;
 }
-

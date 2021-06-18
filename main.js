@@ -26,20 +26,30 @@ const playedNumbers = {};
 const directions = ["left", "up", "upleft", "downleft"];
 
 //state variables
-let numOfTeams, turn, updatedConnected, isAWinner;
+let numOfTeams,
+  turn,
+  updatedConnected,
+  isAWinner,
+  timer,
+  minute,
+  second,
+  isTimerStopped;
 
 //cache elements
 const diceBox = document.querySelector("#dice");
-const colorBox = document.querySelector('#colors')
+const colorBox = document.querySelector("#colors");
 
 //event listeners
 document
   .querySelector("#teamCountConfirm")
   .addEventListener("click", teamConfirm);
 
+diceBox.addEventListener("click", rollDice);
+
 //functions
 function initialize() {
   turn = 0;
+  timer=0;
   const entryBox = document.createElement("input");
   entryBox.setAttribute("id", "entryBox");
   document.querySelector("#entry").appendChild(entryBox);
@@ -48,6 +58,7 @@ function initialize() {
   confirm.setAttribute("id", "confirmButton");
   confirm.addEventListener("click", numberConfirm);
   document.querySelector("#entry").appendChild(confirm);
+  diceBox.innerHTML = `<h1>Roll to Start</h1>`
   render();
   makeBoard();
 }
@@ -64,21 +75,16 @@ function pregameRender() {
 
 //render function
 function render() {
-    colorBox.innerHTML="";
-    for (let i=0; i < numOfTeams;i++){
-        let row = document.createElement('div');
-        row.textContent = `Team ${i+1}`
-        row.style.backgroundColor = teamColors[i];
-        if ((turn-i)%numOfTeams===0){
-            row.style.border = '2pt solid black';
-            row.style.fontSize = '20pt'
-        }
-        colorBox.appendChild(row);
+  colorBox.innerHTML = "";
+  for (let i = 0; i < numOfTeams; i++) {
+    let row = document.createElement("div");
+    row.textContent = `Team ${i + 1}`;
+    row.style.backgroundColor = teamColors[i];
+    if ((turn - i) % numOfTeams === 0) {
+      row.style.border = "2pt solid black";
+      row.style.fontSize = "20pt";
     }
-    diceBox.innerHTML = "";
-  for (let i = 1; i <= 4; i++) {
-    let num = makeDie(rollDie());
-    diceBox.appendChild(num);
+    colorBox.appendChild(row);
   }
 }
 
@@ -93,8 +99,17 @@ function makeDie(num) {
   return die;
 }
 
-function rollDie() {
-  return 1 + Math.floor(Math.random() * 6);
+function rollDice() {
+  if (timer <= 0) {
+    diceBox.innerHTML = "";
+    for (let i = 1; i <= 4; i++) {
+      let roll = 1 + Math.floor(Math.random() * 6);
+      let num = makeDie(roll);
+      diceBox.appendChild(num);
+    }
+    timer = 4 * 60000;
+    timerUpdate();
+  }
 }
 
 function makeBoard() {
@@ -119,6 +134,19 @@ function teamConfirm() {
   initialize();
 }
 
+function timerUpdate() {
+  if (timer >= 0) {
+    minute = Math.floor(timer / 60000);
+    second = Math.ceil((timer - 60000 * minute) / 1000).toString();
+    second = second.length === 2 ? second : "0" + second;
+    document.querySelector("#timer").textContent = `${minute}:${second}`;
+    setTimeout(() => {
+      timer -= 1000;
+      timerUpdate();
+    }, 1000);
+  }
+}
+
 function numberConfirm() {
   let inputNumber = document.querySelector("#entryBox").value;
   if (
@@ -132,10 +160,14 @@ function numberConfirm() {
     document.querySelector(`#box${inputNumber}`).style.backgroundColor =
       teamColors[turn % numOfTeams];
     update(inputNumber);
-    if (checkWin(inputNumber)){
-        return document.body.innerHTML=`<h1>Team ${(turn%numOfTeams)+1} Wins!`
+    if (checkWin(inputNumber)) {
+      return (document.body.innerHTML = `<h1>Team ${
+        (turn % numOfTeams) + 1
+      } Wins!`);
     }
     turn++;
+    timer = 0;
+    diceBox.innerHTML = `<h1>Roll to Start</h1>`
     render();
   }
   document.querySelector("#entryBox").value = "";
@@ -145,14 +177,17 @@ function updateDirection(id, distance, direction, possibleCallback) {
   if (
     possibleCallback(id) &&
     (!!playedNumbers[`#box${parseInt(id) + distance}`]
-      ? playedNumbers[`#box${parseInt(id) + distance}`].team === turn % numOfTeams
+      ? playedNumbers[`#box${parseInt(id) + distance}`].team ===
+        turn % numOfTeams
       : false)
   ) {
     updatedConnected = playedNumbers[`#box${id}`][direction].concat(
-      playedNumbers[`#box${parseInt(id) +distance}`][direction]
+      playedNumbers[`#box${parseInt(id) + distance}`][direction]
     );
     playedNumbers[`#box${id}`][direction] = updatedConnected;
-    for (let playedId of playedNumbers[`#box${parseInt(id) + distance}`][direction]) {
+    for (let playedId of playedNumbers[`#box${parseInt(id) + distance}`][
+      direction
+    ]) {
       playedNumbers[playedId][direction] = updatedConnected;
     }
   }
@@ -178,7 +213,7 @@ function update(id) {
 }
 
 function checkWin(id) {
-    for (let point of directions){
+  for (let point of directions) {
     if (playedNumbers[`#box${id}`][point].length >= 4) {
       return true;
     }
