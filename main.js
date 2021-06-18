@@ -49,7 +49,7 @@ diceBox.addEventListener("click", rollDice);
 //functions
 function initialize() {
   turn = 0;
-  timer=0;
+  timer = 0;
   const entryBox = document.createElement("input");
   entryBox.setAttribute("id", "entryBox");
   document.querySelector("#entry").appendChild(entryBox);
@@ -58,7 +58,7 @@ function initialize() {
   confirm.setAttribute("id", "confirmButton");
   confirm.addEventListener("click", numberConfirm);
   document.querySelector("#entry").appendChild(confirm);
-  diceBox.innerHTML = `<h1>Roll to Start</h1>`
+  diceBox.innerHTML = `<h1>Roll to Start</h1>`;
   render();
   makeBoard();
 }
@@ -153,7 +153,8 @@ function numberConfirm() {
     inputNumber % 1 === 0 &&
     inputNumber > 0 &&
     inputNumber < 101 &&
-    !Object.keys(playedNumbers).includes(`#box${inputNumber}`)
+    !Object.keys(playedNumbers).includes(`#box${inputNumber}`) &&
+    timer > 0
   ) {
     let played = new PlayedSquare(`#box${inputNumber}`, turn % numOfTeams);
     playedNumbers[played.id] = played;
@@ -167,7 +168,7 @@ function numberConfirm() {
     }
     turn++;
     timer = 0;
-    diceBox.innerHTML = `<h1>Roll to Start</h1>`
+    diceBox.innerHTML = `<h1>Roll to Start</h1>`;
     render();
   }
   document.querySelector("#entryBox").value = "";
