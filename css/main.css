@@ -3,6 +3,19 @@ body {
     justify-content: center;
 }
 
+#header {
+    display: grid;
+    grid-template-columns: 100px auto;
+}
+
+#colors {
+    display:flexbox;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+
 #dice {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;

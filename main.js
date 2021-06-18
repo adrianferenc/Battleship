@@ -30,6 +30,7 @@ let numOfTeams, turn, updatedConnected, isAWinner;
 
 //cache elements
 const diceBox = document.querySelector("#dice");
+const colorBox = document.querySelector('#colors')
 
 //event listeners
 document
@@ -63,7 +64,18 @@ function pregameRender() {
 
 //render function
 function render() {
-  diceBox.innerHTML = "";
+    colorBox.innerHTML="";
+    for (let i=0; i < numOfTeams;i++){
+        let row = document.createElement('div');
+        row.textContent = `Team ${i+1}`
+        row.style.backgroundColor = teamColors[i];
+        if ((turn-i)%numOfTeams===0){
+            row.style.border = '2pt solid black';
+            row.style.fontSize = '20pt'
+        }
+        colorBox.appendChild(row);
+    }
+    diceBox.innerHTML = "";
   for (let i = 1; i <= 4; i++) {
     let num = makeDie(rollDie());
     diceBox.appendChild(num);
@@ -121,7 +133,7 @@ function numberConfirm() {
       teamColors[turn % numOfTeams];
     update(inputNumber);
     if (checkWin(inputNumber)){
-        return document.body.innerHTML=''
+        return document.body.innerHTML=`<h1>Team ${(turn%numOfTeams)+1} Wins!`
     }
     turn++;
     render();
