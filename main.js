@@ -107,3 +107,4 @@ ai.isEnemy();
 
 
 ai.squares['ai2'].occupied=true;
+
