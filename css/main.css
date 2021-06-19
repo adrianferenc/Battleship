@@ -1,0 +1,33 @@
+body {
+    /* This will be made into its own div or something, this is just so the boards show up separately */
+    display: flex; 
+    justify-content: space-around;
+    
+}
+
+.board {
+  display: grid;
+  grid-template: auto auto auto auto auto auto auto auto auto auto / auto auto auto auto auto auto auto auto auto auto;
+  /* order: 5pt solid black; */
+  height:200px;
+  width: 300px;
+  margin:0;
+}
+
+.unplayed-square {
+  display: grid;
+  border: .5pt solid black;
+  background-color:teal;
+}
+
+.played-square {
+  display: grid;
+  border: .5pt solid black;
+  background-color:goldenrod;
+}
+
+.hit-square {
+    display: grid;
+    border: .5pt solid black;
+    background-color:red;
+  }
