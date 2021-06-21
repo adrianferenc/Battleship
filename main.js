@@ -1,3 +1,23 @@
+/*----- constants -----*/
+
+/*----- app's state (variables) -----*/
+
+/*----- cached element references -----*/
+
+/*----- event listeners -----*/
+
+/*----- functions -----*/
+function initialize() {}
+
+function startRound() {}
+
+function getWinner() {}
+
+function render() {}
+
+
+
+
 class Square {
   constructor(id) {
     this.id = id;
@@ -54,15 +74,16 @@ class Board {
           square.className += " unplayed-square";
         }
         square.setAttribute("id", `${10 * i + j}`);
-        board.addEventListener("click", (event) =>
-          this.squareClicker(event, this)
-        );
         board.appendChild(square);
       }
     }
+    board.addEventListener("click", (event) =>
+          this.squareClicker(event, this)
+        );
     document.body.appendChild(board);
   }
 
+  
   createSquare(i, j) {
     let squareId = `${this.name}${10 * i + j}`;
     let squareObject = new Square(squareId);
@@ -142,6 +163,7 @@ class Board {
   }
 
   shipyard() {
+    this.createShips();
     const shipyard = document.createElement("div");
     shipyard.setAttribute("id", "shipyard");
     for (let ship in this.ships) {
@@ -160,10 +182,8 @@ class Battleship {
 let player = new Board("player");
 player.buildBoard();
 
-player.createShips();
-
 player.shipyard();
 
-//let ai = new Board("ai", true);
-//ai.buildBoard();
-// ai.squares["ai2"].occupied = true;
+let ai = new Board("ai", true);
+ai.buildBoard();
+ai.squares["ai2"].occupied = true;
