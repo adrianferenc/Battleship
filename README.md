@@ -1,6 +1,6 @@
 # Battleship
 
-#How The Game Is Played:
+# How The Game Is Played:
 In this game, you will play battleship against an AI. The game works in 2 main stages. The first stage is where the human player places their 5 ships onto their 10x10 grid. Then the second stage starts where each player (human player & AI) go back and forth picking squares on the grid where they believe their opponent has put a ship. When an entire ship is sunk, the other player is alerted. The game proceeds until one player's ships are all sunk, at which point the other player wins.
 
 ## A Brief History of Battleship:
@@ -16,7 +16,7 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 
 ## My Game
 
-###Stage 1: Placing ships on your board.
+### Stage 1: Placing ships on your board.
 - Features of this stage:
 	- Player's board where the ships are placed. The board is made up of 100 squares, each with their own id and associated object which stores necessary information. The ship will have a position which is where the top of the ship will be, as well as a direction, which indicates where the rest of the ship goes. 
 	- A "shipyard" with the ships that have not been placed yet and can be selected. By default the topmost ship is autoselected. When a ship is hovering over the board, the squares that would be occupied change color.
@@ -24,7 +24,7 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 	- A button that undoes placing a ship and puts it back in the shipyard. It removes the position property of the ship and adds it back to the shipyard div.
 	- A start button that only works once all the ships are placed. 
 
-###Stage 2: Playing against AI
+### Stage 2: Playing against AI
 - This stage has two parts, one where player makes a move, one where AI makes a move.
 - Featuers of this stage:
 	- Two boards, the player board, which has the player's ships visible to them, and the AI board, where the player places their moves
