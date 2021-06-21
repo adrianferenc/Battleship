@@ -14,18 +14,31 @@ class Square {
   }
 
   row() {
-    return Math.floor(parseInt(id) / 10);
+    return Math.floor(parseInt(this.id) / 10);
   }
 
   column() {
-    return parseInt(id) % 10;
+    return parseInt(this.id) % 10;
+  }
+}
+
+class Ship {
+  constructor(name, length) {
+    this.name = name;
+    this.length = length;
+    this.ship = [];
+    this.position = null;
+    this.orientation = null;
+    this.sunk = false;
   }
 }
 
 class Board {
-  constructor(name) {
+  constructor(name, isEnemy = false) {
     this.name = name;
+    this.isEnemy = isEnemy;
     this.squares = {};
+    this.ships = {};
   }
 
   buildBoard() {
@@ -36,16 +49,18 @@ class Board {
       for (let j = 0; j < 10; j++) {
         this.createSquare(i, j);
         let square = document.createElement("div");
-        square.setAttribute("class", "unplayed-square");
+        square.setAttribute("class", "square");
+        if (this.isEnemy) {
+          square.className += " unplayed-square";
+        }
         square.setAttribute("id", `${10 * i + j}`);
+        board.addEventListener("click", (event) =>
+          this.squareClicker(event, this)
+        );
         board.appendChild(square);
       }
     }
     document.body.appendChild(board);
-  }
-
-  isEnemy(){
-    document.querySelector(`#${this.name}-board`).addEventListener("click", (event) => this.squareClicker(event,this));
   }
 
   createSquare(i, j) {
@@ -80,17 +95,61 @@ class Board {
     this.squares[squareId] = squareObject;
   }
 
-  squareClicker(event,object) {
+  squareClicker(event, object) {
     if (
       event.target.className !== "board" &&
-      event.target.className === "unplayed-square"
+      event.target.className.includes("unplayed-square")
     ) {
       if (object.squares[`${object.name}${event.target.id}`].occupied) {
-        event.target.setAttribute("class", "hit-square");
+        event.target.className = "square hit-square";
       } else {
-        event.target.setAttribute("class", "played-square");
+        event.target.className = "square played-square";
       }
     }
+  }
+
+  createShips() {
+    const shipsAndSizes = [
+      ["carrier", 5],
+      ["battleship", 4],
+      ["submarine", 3],
+      ["cruiser", 3],
+      ["destroyer", 2],
+    ];
+    shipsAndSizes.forEach(
+      (sAS) => (this.ships[sAS[0]] = new Ship(sAS[0], sAS[1]))
+    );
+  }
+
+  buildAShip(shipName) {
+    let newShip = document.createElement("div");
+    newShip.setAttribute("id", shipName);
+    newShip.setAttribute("class", "ship");
+    let ShipsName = document.createElement("div");
+    ShipsName.textContent = shipName;
+    newShip.appendChild(ShipsName);
+    let spacer = document.createElement("div");
+    newShip.appendChild(spacer);
+    let thisShip = this.ships[shipName];
+    for (let i = 0; i < thisShip.length; i++) {
+      let shipSquare = document.createElement("div");
+      shipSquare.setAttribute("id", `${thisShip.name}-${i}`);
+      shipSquare.setAttribute("class", "ship-square");
+      thisShip.ship.push(shipSquare);
+      newShip.appendChild(shipSquare);
+    }
+    return newShip;
+  }
+
+  shipyard() {
+    const shipyard = document.createElement("div");
+    shipyard.setAttribute("id", "shipyard");
+    for (let ship in this.ships) {
+      console.log(ship);
+      let newShip = this.buildAShip(ship);
+      shipyard.appendChild(newShip);
+    }
+    document.body.appendChild(shipyard);
   }
 }
 
@@ -101,10 +160,10 @@ class Battleship {
 let player = new Board("player");
 player.buildBoard();
 
-let ai = new Board("ai");
-ai.buildBoard();
-ai.isEnemy();
+player.createShips();
 
+player.shipyard();
 
-ai.squares['ai2'].occupied=true;
-
+//let ai = new Board("ai", true);
+//ai.buildBoard();
+// ai.squares["ai2"].occupied = true;
