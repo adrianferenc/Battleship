@@ -42,6 +42,52 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 - The game will recognize when one of the team's ships have all been sunk and declare the other player the winner.
 
 
+## Pseudocode:
+
+- Overall outline:
+	- Stage 1 setup
+		- show player's board and the available ships to place
+		- once the ships have been placed and start is pressed, move to stage 2
+	- Stage 2 setup
+		- show player and ai's board and the fire button
+	- Stage 2 gameplay
+		- allow player to attack on their turn and ai to attack on theirs
+	- Announce a winner once one of the players' ships are all sunk
+
+- Stage 1 setup
+	- create a square class which makes a single square and has the following functionality:
+		- properties, with the parameter of id passed in
+			- id, the id of the square
+			- up/down/left/right, the square immediately above it, immediately below, immediately to the left, and immediately to the right, all initialized to null
+			- upList/downList/..., arrays for all available squares above, all available squares below, ... all initialized to an array containing just the square's id
+			- occupied, whether the square is occupied with a ship, initialized to false
+			- hit, if the square is hit or not, initialized to false
+		- methods
+			- row and column methods which return the row/column the square is on in the entire board.
+
+	- create a ship class which has the following functionality:
+		- properties, with the parameters of name and length passed in
+			- name, ship's name
+			- length, ship's length
+			- ship, an array containing the ids of the squares the ship is in, initialized to an empty array
+			- position, the id of the head of the ship's position on the board, initialized to null
+			- orientation, the ship's orientation, i.e. upDown or leftRight, initialized to null
+			- sunk, whether the ship is sunk, initialized to false
+
+	- create a board class which has the following functionality:
+		- properties, with the parameters of name and isEnemy which is predefined as false if there is no input
+			- name, the name of the player, i.e. 'player' or 'ai'
+			- isEnemy, whether they're the player or the enemy
+			- squares, an object of all the squares on the board, initialized to an empty object
+			- ships, an object of all the ships on the board, initialized to an empty object
+		- methods
+		- createSquare, which has parameters i and j (which are the position on the board. This method creates a square object using the square class. The id is `${this.name}${10 * i + j}`. This method also fills in the up/down/left/right properties of the square, based on the idea that these will be created sequentially, i.e. i,j increasing from 0 to 9 each using for loops. For any square whose i value isn't 0, i.e. isn't on the first row, it adds the up object that has already been defined. It also sets itself as the down property of the square above it. left and right are similarly defined, except the condition that's needed to be checked is if j%10!==0, as those are squares along the left edge. Similarly, the upList/downList/... arrays are created. The upList is created by concatenating the square's own upList with the upList of the square above it. To create the downList, we use a forEach method on the upList of the square to push its own id to all of the objects in the upList. leftList and rightList are created similarly. Finally, createSquare adds this square object to the board's squares object using the square's id as its key.
+		- buildBoard, which uses 2 for loops to go through 0 through 99, by having i go through 0 to 9 and j go through 0 to 9. For each pair of values, an object is created using the createSquare method. A div element called Moreover, a div element is created with id `${this.name}-board`. Each square is created using the square class whose object is added to the square property of the board. A div element for the square is created with id `${10 * i + j}` and appended to the board div. After the for loop ends, an event listener with type `'click'` and callback `(event) => this.squareClicker(event, this)`. Finally, the board element is appended as a child to the body.
+		- squareClicker, which has two parameters, event and object. This method changes the style of the square to indicate if it's been selected, and if so, if it was a hit.
+
+
+
+
 Play [here!](https://www.google.com/search?q=battleship)
 
 Wireframes: [Game setup](https://wireframe.cc/1ksKgk) [Gameplay](https://wireframe.cc/ierRfK)
