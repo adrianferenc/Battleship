@@ -22,6 +22,12 @@ body {
   background-color: teal;
 }
 
+.occupied-square {
+  display: grid;
+  border: 0.5pt solid black;
+  background-color: gray;
+}
+
 .played-square {
   background-color: goldenrod;
 }
