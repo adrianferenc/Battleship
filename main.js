@@ -8,7 +8,21 @@ const possibleShips = {
 };
 
 /*----- app's state (variables) -----*/
-let player, shipyard, ai, stage, selectedShip, orientation, playerBoard;
+let player,
+  shipyard,
+  ai,
+  stage,
+  selectedShip,
+  orientation,
+  playerBoard,
+  startButton,
+  orientButton,
+  buttons,
+  placedShips,
+  randomSquare,
+  turn,
+  randomOrientation,
+  shipyardDisplay;
 
 /*----- cached element references -----*/
 //  const playerBoardDom = document.querySelector("player-board");
@@ -89,11 +103,16 @@ class Board {
 class Shipyard {
   constructor() {
     this.ships = {
-      carrier: { name: "carrier", length: 5, placed: false },
-      battleship: { name: "battleship", length: 4, placed: false },
-      submarine: { name: "submarine", length: 3, placed: false },
-      cruiser: { name: "cruiser", length: 3, placed: false },
-      destroyer: { name: "destroyer", length: 2, placed: false },
+      carrier: { name: "carrier", length: 5, position: [], class: "ship" },
+      battleship: {
+        name: "battleship",
+        length: 4,
+        position: [],
+        class: "ship",
+      },
+      submarine: { name: "submarine", length: 3, position: [], class: "ship" },
+      cruiser: { name: "cruiser", length: 3, position: [], class: "ship" },
+      destroyer: { name: "destroyer", length: 2, position: [], class: "ship" },
     };
   }
 
@@ -101,19 +120,17 @@ class Shipyard {
     let shipyard = document.createElement("div");
     shipyard.setAttribute("id", "shipyard");
     for (let ship in this.ships) {
-      if (!this.ships[ship].placed) {
-        let shipDiv = this.buildShip(ship);
-        shipyard.appendChild(shipDiv);
-      }
+      let shipDiv = this.buildShip(ship);
+      shipyard.appendChild(shipDiv);
     }
     return shipyard;
   }
 
   buildShip(shipName) {
+    let thisShip = this.ships[shipName];
     let newShip = document.createElement("div");
     newShip.setAttribute("id", shipName);
-    newShip.setAttribute("class", "ship");
-    let thisShip = this.ships[shipName];
+    newShip.setAttribute("class", thisShip.class);
     for (let i = 0; i < thisShip.length; i++) {
       let shipSquare = document.createElement("div");
       shipSquare.setAttribute("id", `${shipName}-${i}`);
@@ -129,15 +146,47 @@ class Shipyard {
 function initialize() {
   //This starts the game and initializes all necessary variables.
   player = new Board("player");
-  ai = new Board("ai");
   shipyard = new Shipyard();
   for (let i = 0; i < 100; i++) {
     player.createSquare(i);
-    ai.createSquare(i);
   }
+  placedShips = {};
   orientation = "leftRight";
+  orientButton = document.createElement("button");
+  orientButton.setAttribute("id", "orient-button");
+  orientButton.innerText = "Rotate";
+  orientButton.addEventListener("click", () => {
+    orientation === "leftRight"
+      ? (orientation = "upDown")
+      : (orientation = "leftRight");
+    render();
+  });
+  startButton = document.createElement("button");
+  startButton.setAttribute("id", "start-button");
+  startButton.textContent = "Start";
+  startButton.addEventListener("click", () => {
+    stage = Object.keys(player.ships).length === 5 ? 2 : 1;
+    initializeStageTwo();
+    render();
+  });
+  buttons = document.createElement("div");
+  buttons.setAttribute("id", "buttons");
+  buttons.appendChild(orientButton);
+  buttons.appendChild(startButton);
   stage = 1;
   render(player, shipyard, ai);
+}
+
+function initializeStageTwo() {
+  playerBoard.removeEventListener("click", (e) => squareClicker(e));
+  ai = new Board("ai");
+  for (let i = 0; i < 100; i++) {
+    ai.createSquare(i);
+    ai.squares[sq(i)].class = "unplayed-square";
+  }
+  placeAIShips();
+  turn = 1;
+  render();
 }
 
 function startRound() {
@@ -152,16 +201,17 @@ function render() {
   document.body.innerHTML = "";
   //This updates the player board, the shipyard, and the ai board
   playerBoard = player.buildBoard();
-  playerBoard.addEventListener("click", (e) => squareClicker(e));
-  playerBoard.addEventListener("click", placeAShip);
-  //updateSquares()
-  document.body.appendChild(playerBoard);
   if (stage === 1) {
-    let shipyardDisplay = shipyard.buildShipyard();
+    playerBoard.addEventListener("click", placeAShip);
+    document.body.appendChild(playerBoard);
+    shipyardDisplay = shipyard.buildShipyard();
     document.body.appendChild(shipyardDisplay);
+    startButton.disabled = Object.keys(player.ships).length < 5;
+    document.body.appendChild(buttons);
   } else if (stage === 2) {
-    playerBoard.removeEventListener("click", (e) => squareClicker(e));
-    let aiBoard = ai.buildBoard();
+    aiBoard = ai.buildBoard();
+    playerBoard = player.buildBoard();
+    document.body.appendChild(playerBoard);
     document.body.appendChild(aiBoard);
   }
 }
@@ -184,22 +234,25 @@ function unsquare(id) {
   return parseInt(id.split("-")[1]);
 }
 
-function squareClicker(e) {
-  // This should allow the squares to change color under certain circumstances. This is done by changing the class of the square object in the squares object.
-  //let squareId = e.target.id;
-}
-
 function placeAShip(e) {
   let i = unsquare(e.target.id);
   if (selectedShip) {
-    let length = possibleShips[selectedShip].length;
-    if (selectedShip && isPlaceable(selectedShip, i)) {
+    let length = shipyard.ships[selectedShip].length;
+    if (selectedShip && isPlaceable(selectedShip, i, player, orientation)) {
       if (orientation === "leftRight") {
         for (let j = 0; j < length; j++) {
           player.squares[sq(i + j)].occupied = true;
+          shipyard.ships[selectedShip].position.push(i + j);
           player.squares[sq(i + j)].class = "occupied-square";
         }
+      } else {
+        for (let j = 0; j < length; j++) {
+          player.squares[sq(i + 10 * j)].occupied = true;
+          shipyard.ships[selectedShip].position.push(i + 10 * j);
+          player.squares[sq(i + 10 * j)].class = "occupied-square";
+        }
       }
+      player.ships[selectedShip] = shipyard.ships[selectedShip];
       delete shipyard.ships[selectedShip];
       selectedShip = null;
     }
@@ -207,53 +260,58 @@ function placeAShip(e) {
   render();
 }
 
-function selectAShip(e) {
-  selectedShip = e.target.id.split("-")[0];
+function placeAIShips() {
+  aiShipyard = new Shipyard();
+  for (let ship in aiShipyard.ships) {
+    do {
+      randomSquare = Math.floor(Math.random() * 100);
+      randomOrientation = ["leftRight", "upDown"][Math.round(Math.random())];
+    } while (!isPlaceable(ship, randomSquare, ai, randomOrientation));
+    console.log(ship);
+    console.log(randomSquare);
+    console.log(ai);
+    console.log(randomOrientation);
+    console.log(isPlaceable(ship, randomSquare, ai, randomOrientation));
+    let length = aiShipyard.ships[ship].length;
+    if (randomOrientation === "leftRight") {
+      for (let j = 0; j < length; j++) {
+        ai.squares[sq(randomSquare + j)].occupied = true;
+        aiShipyard.ships[ship].position.push(randomSquare + j);
+        ai.squares[sq(randomSquare + j)].class = "occupied-square";
+      }
+    } else {
+      for (let j = 0; j < length; j++) {
+        ai.squares[sq(randomSquare + 10 * j)].occupied = true;
+        aiShipyard.ships[ship].position.push(randomSquare + 10 * j);
+        ai.squares[sq(randomSquare + 10 * j)].class = "occupied-square";
+      }
+    }
+    ai.ships[ship] = aiShipyard.ships[ship];
+  }
 }
-// if (isPlaceable(selectedShip,unsquare(e.target.id))){
-//     console.log('niceee');
-// }
 
-//This should select a ship. It will do multiple things (so will possible be made up of several functions). It sets selectedShip to the selected ship. It activates an eventlistener which uses mouseover and shows in some way where the ship would be placed if clicked. It also adds a click event listener that would set the ship in place.
-//   let idx = shipsAndSizes
-//     .map((sAS) => sAS[0])
-//     .indexOf(event.target.id.split("-")[0]);
-//   let id = shipsAndSizes[idx];
-//   if (id + 1) {
-//     if (attachedPlacementListener) {
-//       document
-//         .querySelector(`#${name}-board`)
-//         .removeEventListener("mouseover", () => this.placeAShip());
-//       //   attachedPlacementListener=false;
-//     }
-//     if (this.selectedShip && this.selectedShip[0] === id[0]) {
-//       document
-//         .querySelector(`#${this.selectedShip[0]}`)
-//         .classList.remove("selected-ship");
-//       document
-//         .querySelector(`#${name}-board`)
-//         .removeEventListener("mouseover", () => this.placeAShip());
-//       this.selectedShip = null;
-//     } else {
-//       document.querySelector(`#${id[0]}`).classList.add("selected-ship");
-//       this.selectedShip = id;
-//       document
-//         .querySelector(`#${name}-board`)
-//         .addEventListener("mouseover", () => this.placeAShip());
-//       attachedPlacementListener = true;
-//     }
-//   }
-
-function isPlaceable(ship, i) {
+function selectAShip(e) {
   if (selectedShip) {
+    shipyard.ships[selectedShip].class = "ship";
+  }
+  selectedShip = e.target.id.split("-")[0];
+  shipyard.ships[selectedShip].class = "selected-ship";
+  render();
+}
+
+function isPlaceable(ship, i, side, orientation) {
+  if (ship) {
     let length = possibleShips[ship].length;
     if (orientation === "leftRight") {
       for (let j = 0; j < length; j++) {
-        if (
-          i + j >= 100 ||
-          player.squares[sq(i + j)].occupied ||
-          (i + j) % 10 < i % 10
-        ) {
+        if (side.squares[sq(i + j)].occupied || (i + j) % 10 < i % 10) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      for (let j = 0; j < length; j++) {
+        if (i + 10 * j >= 100 || side.squares[sq(i + 10 * j)].occupied) {
           return false;
         }
       }
