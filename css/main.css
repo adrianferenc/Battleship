@@ -37,15 +37,11 @@ body {
 #shipyard {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  text-transform: capitalize;
-  padding: 0 100px;
+  justify-content: space-between;
 }
 
 .ship {
-  display: grid;
-  width: 100px;
-  grid-template: auto / auto 5% 20% 20% 20% 20% 1fr;
+  display: flex;
 }
 
 .ship-square {

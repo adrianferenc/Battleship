@@ -8,7 +8,7 @@ const possibleShips = {
 };
 
 /*----- app's state (variables) -----*/
-let selectedShip;
+let stage, selectedShip;
 
 /*----- cached element references -----*/
 const playerBoard = document.querySelector("player-board");
@@ -16,7 +16,7 @@ const aiBoard = document.querySelector("ai-board");
 const shipyard = document.querySelector("shipyard");
 
 /*----- event listeners -----*/
-//   playerBoard.addEventListener("click", (e) => squareClicker(e));
+    playerBoard.addEventListener("click", (e) => squareClicker(e));
 
 /*----- classes -----*/
 class Square {
@@ -106,9 +106,6 @@ class Shipyard {
     for (let ship in this.ships) {
       if (!this.ships[ship].placed) {
         let shipDiv = this.buildShip(ship);
-        let shipName = document.createElement("p");
-        shipName.textContent = ship;
-        shipyard.appendChild(shipName);
         shipyard.appendChild(shipDiv);
       }
     }
@@ -147,11 +144,14 @@ class Shipyard {
 function initialize() {
   //This starts the game and initializes all necessary variables.
   const player = new Board("player");
+  const ai = new Board("ai");
   const shipyard = new Shipyard();
   for (let i = 0; i < 100; i++) {
     player.createSquare(i);
+    ai.createSquare(i);
   }
-  render(player,shipyard);
+  stage = 1;
+  render(player, shipyard, ai);
 }
 
 function startRound() {
@@ -162,12 +162,18 @@ function getWinner() {
   //This checks if a player has won
 }
 
-function render(player,shipyard) {
+function render(player, shipyard, ai) {
   //This updates the player board, the shipyard, and the ai board
   let playerBoard = player.buildBoard();
   document.body.appendChild(playerBoard);
-  let shipyardDisplay = shipyard.buildShipyard();
-  document.body.appendChild(shipyardDisplay);
+  if (stage ===1){
+    let shipyardDisplay = shipyard.buildShipyard();
+    document.body.appendChild(shipyardDisplay);
+  } else if (stage ===2){
+    let aiBoard = ai.buildBoard();
+  document.body.appendChild(aiBoard);
+  }
+  
 }
 
 function sq(i) {
