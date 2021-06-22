@@ -1,62 +1,44 @@
 /*----- constants -----*/
+const possibleShips = {
+  carrier: { name: "carrier", length: 5 },
+  battleship: { name: "battleship", length: 4 },
+  submarine: { name: "submarine", length: 3 },
+  cruiser: { name: "cruiser", length: 3 },
+  destroyer: { name: "destroyer", length: 2 },
+};
 
 /*----- app's state (variables) -----*/
+let selectedShip;
 
 /*----- cached element references -----*/
+const playerBoard = document.querySelector("player-board");
+const aiBoard = document.querySelector("ai-board");
+const shipyard = document.querySelector("shipyard");
 
 /*----- event listeners -----*/
+//   playerBoard.addEventListener("click", (e) => squareClicker(e));
 
-/*----- functions -----*/
-function initialize() {}
-
-function startRound() {}
-
-function getWinner() {}
-
-function render() {}
-
-
-
-
+/*----- classes -----*/
 class Square {
   constructor(id) {
-    this.id = id;
+    this.class = "square";
+    this.id = `square-${id}`;
     this.up = null;
     this.down = null;
     this.left = null;
     this.right = null;
-    this.upList = [this.id];
-    this.downList = [this.id];
-    this.leftList = [this.id];
+    this.upList = [];
+    this.downList = [];
+    this.leftList = [];
     this.rightList = [];
+    this.attacked = false;
     this.occupied = false;
-    this.hit = false;
-  }
-
-  row() {
-    return Math.floor(parseInt(this.id) / 10);
-  }
-
-  column() {
-    return parseInt(this.id) % 10;
-  }
-}
-
-class Ship {
-  constructor(name, length) {
-    this.name = name;
-    this.length = length;
-    this.ship = [];
-    this.position = null;
-    this.orientation = null;
-    this.sunk = false;
   }
 }
 
 class Board {
-  constructor(name, isEnemy = false) {
+  constructor(name) {
     this.name = name;
-    this.isEnemy = isEnemy;
     this.squares = {};
     this.ships = {};
   }
@@ -65,125 +47,172 @@ class Board {
     let board = document.createElement("div");
     board.setAttribute("class", "board");
     board.setAttribute("id", `${this.name}-board`);
-    for (let i = 0; i < 10; i++) {
-      for (let j = 0; j < 10; j++) {
-        this.createSquare(i, j);
-        let square = document.createElement("div");
-        square.setAttribute("class", "square");
-        if (this.isEnemy) {
-          square.className += " unplayed-square";
-        }
-        square.setAttribute("id", `${10 * i + j}`);
-        board.appendChild(square);
-      }
+    for (let i = 0; i < 100; i++) {
+      let newSquare = this.squares[sq(i)];
+      let squareDiv = document.createElement("div");
+      squareDiv.setAttribute("class", newSquare.class);
+      squareDiv.setAttribute("id", newSquare.id);
+      board.appendChild(squareDiv);
     }
-    board.addEventListener("click", (event) =>
-          this.squareClicker(event, this)
-        );
-    document.body.appendChild(board);
+    return board;
   }
 
-  
-  createSquare(i, j) {
-    let squareId = `${this.name}${10 * i + j}`;
-    let squareObject = new Square(squareId);
+  createSquare(i) {
+    let squareId = sq(i);
+    let squareObject = new Square(i);
+    this.squares[squareId] = squareObject;
     //Updates up, down, upList, and downList
-    if (i !== 0) {
-      squareObject.up = this.squares[`${this.name}${10 * (i - 1) + j}`].id;
-      squareObject.upList = this.squares[
-        `${this.name}${10 * (i - 1) + j}`
-      ].upList.concat(squareObject.upList);
-      this.squares[`${this.name}${10 * (i - 1) + j}`].down = squareObject.id;
+    if (i >= 10) {
+      let above = sq(i - 10);
+      squareObject.up = above;
+      squareObject.upList = this.squares[above].upList.concat([squareId]);
+      this.squares[above].down = squareId;
       squareObject.upList.forEach((ID) => {
-        if (ID !== squareObject.id) {
-          this.squares[ID].downList.push(squareObject.id);
+        if (ID !== squareId) {
+          this.squares[ID].downList.push(squareId);
         }
       });
     }
     //Updates left, right, leftList, and rightList
-    if (j % 10 !== 0) {
-      squareObject.left = this.squares[`${this.name}${10 * i + j - 1}`].id;
-      squareObject.leftList = this.squares[
-        `${this.name}${10 * i + j - 1}`
-      ].leftList.concat(squareObject.leftList);
-      this.squares[`${this.name}${10 * i + j - 1}`].right = squareObject.id;
+    if (i % 10 !== 0) {
+      let left = sq(i - 1);
+      squareObject.left = left;
+      squareObject.leftList = this.squares[left].leftList.concat([squareId]);
+      this.squares[left].right = squareId;
       squareObject.leftList.forEach((ID) => {
-        if (ID !== squareObject.id) {
-          this.squares[ID].rightList.push(squareObject.id);
+        if (ID !== squareId) {
+          this.squares[ID].rightList.push(squareId);
         }
       });
     }
-    this.squares[squareId] = squareObject;
+    return squareObject;
+  }
+}
+
+class Shipyard {
+  constructor() {
+    this.ships = {
+      carrier: { name: "carrier", length: 5, placed: false },
+      battleship: { name: "battleship", length: 4, placed: false },
+      submarine: { name: "submarine", length: 3, placed: false },
+      cruiser: { name: "cruiser", length: 3, placed: false },
+      destroyer: { name: "destroyer", length: 2, placed: false },
+    };
   }
 
-  squareClicker(event, object) {
-    if (
-      event.target.className !== "board" &&
-      event.target.className.includes("unplayed-square")
-    ) {
-      if (object.squares[`${object.name}${event.target.id}`].occupied) {
-        event.target.className = "square hit-square";
-      } else {
-        event.target.className = "square played-square";
+  buildShipyard() {
+    let shipyard = document.createElement("div");
+    shipyard.setAttribute("id", "shipyard");
+    for (let ship in this.ships) {
+      if (!this.ships[ship].placed) {
+        let shipDiv = this.buildShip(ship);
+        let shipName = document.createElement("p");
+        shipName.textContent = ship;
+        shipyard.appendChild(shipName);
+        shipyard.appendChild(shipDiv);
       }
     }
+    return shipyard;
   }
 
-  createShips() {
-    const shipsAndSizes = [
-      ["carrier", 5],
-      ["battleship", 4],
-      ["submarine", 3],
-      ["cruiser", 3],
-      ["destroyer", 2],
-    ];
-    shipsAndSizes.forEach(
-      (sAS) => (this.ships[sAS[0]] = new Ship(sAS[0], sAS[1]))
-    );
-  }
-
-  buildAShip(shipName) {
+  buildShip(shipName) {
     let newShip = document.createElement("div");
     newShip.setAttribute("id", shipName);
     newShip.setAttribute("class", "ship");
-    let ShipsName = document.createElement("div");
-    ShipsName.textContent = shipName;
-    newShip.appendChild(ShipsName);
-    let spacer = document.createElement("div");
-    newShip.appendChild(spacer);
     let thisShip = this.ships[shipName];
     for (let i = 0; i < thisShip.length; i++) {
       let shipSquare = document.createElement("div");
-      shipSquare.setAttribute("id", `${thisShip.name}-${i}`);
+      shipSquare.setAttribute("id", `${shipName}-${i}`);
       shipSquare.setAttribute("class", "ship-square");
-      thisShip.ship.push(shipSquare);
       newShip.appendChild(shipSquare);
     }
     return newShip;
   }
 
-  shipyard() {
-    this.createShips();
-    const shipyard = document.createElement("div");
-    shipyard.setAttribute("id", "shipyard");
-    for (let ship in this.ships) {
-      console.log(ship);
-      let newShip = this.buildAShip(ship);
-      shipyard.appendChild(newShip);
+  placeAShip() {
+    if (lastTouched) {
     }
-    document.body.appendChild(shipyard);
+    if (
+      this.orientation === "leftRight" &&
+      +this.selectedShip[1] + (event.target.id.split("-")[1] % 10) <= 10
+    ) {
+    }
+    document.querySelector(`#${event.target.id}`).style.backgroundColor = "red";
+    lastTouched = event;
+    //event.target.style.backgroundColor = 'gray';
   }
 }
 
-class Battleship {
-  constructor() {}
+/*----- functions -----*/
+function initialize() {
+  //This starts the game and initializes all necessary variables.
+  const player = new Board("player");
+  const shipyard = new Shipyard();
+  for (let i = 0; i < 100; i++) {
+    player.createSquare(i);
+  }
+  render(player,shipyard);
 }
 
-let player = new Board("player");
-player.buildBoard();
+function startRound() {
+  //This starts a particular game of battleship.
+}
 
-player.shipyard();
+function getWinner() {
+  //This checks if a player has won
+}
 
-let ai = new Board("ai", true);
-ai.buildBoard();
-ai.squares["ai2"].occupied = true;
+function render(player,shipyard) {
+  //This updates the player board, the shipyard, and the ai board
+  let playerBoard = player.buildBoard();
+  document.body.appendChild(playerBoard);
+  let shipyardDisplay = shipyard.buildShipyard();
+  document.body.appendChild(shipyardDisplay);
+}
+
+function sq(i) {
+  return `square-${i}`;
+}
+
+function squareClicker(e) {
+  // This should allow the squares to change color under certain circumstances. This is done by changing the class of the square object in the squares object.
+  //let squareId = e.target.id;
+}
+
+function selectAShip(e) {
+  //This should select a ship. It will do multiple things (so will possible be made up of several functions). It sets selectedShip to the selected ship. It activates an eventlistener which uses mouseover and shows in some way where the ship would be placed if clicked. It also adds a click event listener that would set the ship in place.
+  let idx = shipsAndSizes
+    .map((sAS) => sAS[0])
+    .indexOf(event.target.id.split("-")[0]);
+  let id = shipsAndSizes[idx];
+  if (id + 1) {
+    if (attachedPlacementListener) {
+      document
+        .querySelector(`#${name}-board`)
+        .removeEventListener("mouseover", () => this.placeAShip());
+      //   attachedPlacementListener=false;
+    }
+    if (this.selectedShip && this.selectedShip[0] === id[0]) {
+      document
+        .querySelector(`#${this.selectedShip[0]}`)
+        .classList.remove("selected-ship");
+      document
+        .querySelector(`#${name}-board`)
+        .removeEventListener("mouseover", () => this.placeAShip());
+      this.selectedShip = null;
+    } else {
+      document.querySelector(`#${id[0]}`).classList.add("selected-ship");
+      this.selectedShip = id;
+      document
+        .querySelector(`#${name}-board`)
+        .addEventListener("mouseover", () => this.placeAShip());
+      attachedPlacementListener = true;
+    }
+  }
+}
+
+initialize();
+
+// let ai = new Board("ai", true);
+// ai.buildBoard();
+// ai.squares["ai2"].occupied = true;

@@ -30,11 +30,16 @@ body {
   background-color: red;
 }
 
+.selected-ship {
+  transform: scale(1.25);
+}
+
 #shipyard {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   text-transform: capitalize;
+  padding: 0 100px;
 }
 
 .ship {
