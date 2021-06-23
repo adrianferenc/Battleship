@@ -8,9 +8,9 @@ const possibleShips = {
 };
 
 const other = {
-    player:'ai',
-    ai: 'player'
-}
+  player: "ai",
+  ai: "player",
+};
 
 /*----- app's state (variables) -----*/
 let player,
@@ -27,6 +27,7 @@ let player,
   randomSquare,
   turn,
   randomOrientation,
+  winner,
   shipyardDisplay;
 
 /*----- cached element references -----*/
@@ -57,6 +58,7 @@ class Board {
     this.name = name;
     this.squares = {};
     this.ships = {};
+    this.remainingShips = 5;
   }
 
   buildBoard() {
@@ -174,6 +176,7 @@ class Shipyard {
 
 /*----- functions -----*/
 function initialize() {
+  document.body.innerHTML = "";
   //This starts the game and initializes all necessary variables.
   player = new Board("player");
   shipyard = new Shipyard();
@@ -226,6 +229,14 @@ function startRound() {
 
 function getWinner() {
   //This checks if a player has won
+  if (ai.remainingShips === 0) {
+    stage = 3;
+    return "You won!";
+  }
+  if (player.remainingShips === 0) {
+    stage = 3;
+    return "The AI won! :(";
+  }
 }
 
 function render() {
@@ -245,6 +256,18 @@ function render() {
     document.body.appendChild(playerBoard);
     document.body.appendChild(aiBoard);
     aiBoard.addEventListener("click", (e) => attackASquare(e));
+  } else {
+    document.body.innerHTML = "";
+    let winningStatement = document.createElement("h1");
+    winningStatement.textContent = winner;
+    let playAgainStatement = document.createElement("h2");
+    playAgainStatement.textContent = "Would you like to play again?";
+    let playAgainButton = document.createElement("button");
+    playAgainButton.textContent("Play again");
+    playAgainButton.addEventListener("click", () => initialize());
+    document.body.appendChild(winningStatement);
+    document.body.appendChild(playAgainStatement);
+    document.body.appendChild(playAgainButton);
   }
 }
 
@@ -346,6 +369,7 @@ function attackASquare(e) {
     if (!ai.squares[e.target.id].attacked) {
       checkHit(ai, e.target.id);
       turn++;
+      winner = getWinner();
       render();
       AIAttacks();
     }
@@ -362,6 +386,7 @@ function checkHit(side, square) {
         side.ships[ship].health--;
         if (side.ships[ship].health === 0) {
           sinkShip(ship, side);
+          side.remainingShips--;
         }
       }
     }
@@ -374,7 +399,11 @@ function sinkShip(ship, side) {
   for (let id of side.ships[ship].position) {
     side.squares[sq(id)].class = "sunk-square";
   }
-  console.log(`${other[side.name].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`)
+  console.log(
+    `${other[
+      side.name
+    ].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`
+  );
 }
 
 function AIAttacks() {
@@ -384,6 +413,7 @@ function AIAttacks() {
     } while (player.squares[sq(randomSquare)].attacked);
     checkHit(player, sq(randomSquare));
     turn++;
+    winner = getWinner();
     render();
   }
 }
