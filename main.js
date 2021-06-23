@@ -250,20 +250,6 @@ function initializeStageTwo() {
   render();
 }
 
-function getWinner() {
-  //This checks if a player has won
-  if (ai.remainingShips === 0) {
-    stage = 3;
-    playerScore++;
-    return "You won!";
-  }
-  if (player.remainingShips === 0) {
-    stage = 3;
-    aiScore++;
-    return "The AI won! :(";
-  }
-}
-
 function render() {
   document.body.innerHTML = "";
   //This updates the player board, the shipyard, and the ai board
@@ -305,12 +291,51 @@ function render() {
   }
 }
 
+function getWinner() {
+  //This checks if a player has won
+  if (ai.remainingShips === 0) {
+    stage = 3;
+    playerScore++;
+    return "You won!";
+  }
+  if (player.remainingShips === 0) {
+    stage = 3;
+    aiScore++;
+    return "The AI won! :(";
+  }
+}
+
 function sq(i) {
   return `square-${i}`;
 }
 
 function unsquare(id) {
   return parseInt(id.split("-")[1]);
+}
+
+function isPlaceable(ship, i, side, orientation) {
+  if (ship) {
+    let length = possibleShips[ship].length;
+    if (orientation === "leftRight") {
+      for (let j = 0; j < length; j++) {
+        if (
+          i + j >= 100 ||
+          side.squares[sq(i + j)].occupied ||
+          (i + j) % 10 < i % 10
+        ) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      for (let j = 0; j < length; j++) {
+        if (i + 10 * j >= 100 || side.squares[sq(i + 10 * j)].occupied) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
 }
 
 function placeAShip(e) {
@@ -371,31 +396,6 @@ function selectAShip(e) {
   render();
 }
 
-function isPlaceable(ship, i, side, orientation) {
-  if (ship) {
-    let length = possibleShips[ship].length;
-    if (orientation === "leftRight") {
-      for (let j = 0; j < length; j++) {
-        if (
-          i + j >= 100 ||
-          side.squares[sq(i + j)].occupied ||
-          (i + j) % 10 < i % 10
-        ) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      for (let j = 0; j < length; j++) {
-        if (i + 10 * j >= 100 || side.squares[sq(i + 10 * j)].occupied) {
-          return false;
-        }
-      }
-      return true;
-    }
-  }
-}
-
 function attackASquare(e) {
   if (turn % 2 === 1) {
     if (!ai.squares[e.target.id].attacked) {
@@ -403,8 +403,22 @@ function attackASquare(e) {
       turn++;
       winner = getWinner();
       render();
-      AIAttacks();
+      if (!winner) {
+        AIAttacks();
+      }
     }
+  }
+}
+
+function AIAttacks() {
+  if (turn % 2 === 0) {
+    do {
+      randomSquare = Math.floor(Math.random() * 100);
+    } while (player.squares[sq(randomSquare)].attacked);
+    checkHit(player, sq(randomSquare));
+    turn++;
+    winner = getWinner();
+    render();
   }
 }
 
@@ -435,18 +449,6 @@ function sinkShip(ship, side) {
       side.name
     ].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`
   );
-}
-
-function AIAttacks() {
-  if (turn % 2 === 0) {
-    do {
-      randomSquare = Math.floor(Math.random() * 100);
-    } while (player.squares[sq(randomSquare)].attacked);
-    checkHit(player, sq(randomSquare));
-    turn++;
-    winner = getWinner();
-    render();
-  }
 }
 
 initialize();
