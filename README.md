@@ -17,16 +17,16 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 - The spectrum analyzer used to get the transmission through is an Anritsu MS2713E Spectrum Master.
 
 ## To do
-- sort app's state variables 
-- fix the right/left/etc. of the squares.
-- have them update when attacks have been made.
-- improve ai to use that data.
+- sort app's state variables alphabetically
+- add a fire button
+- update right/left/etc when attacks have been made.
+- improve ai to use right/left/etc data.
 - have ai when choosing randomly to only use even squares.
 - For CSS:
 	- group like-elements into the same div, instead of just into the body.
 		- examples are board + shipyard, board + board, buttons, etc. 
-	- fix size of battleship board
-	- fix size of shipyard 
+	- set size of battleship board
+	- set size of shipyard 
 
 
 

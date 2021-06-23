@@ -82,27 +82,29 @@ class Board {
     let squareObject = new Square(i);
     this.squares[squareId] = squareObject;
     //Updates up, down, upList, and downList
+    if (i < 10) {
+      squareObject.upList.push(squareId);
+    }
     if (i >= 10) {
       let above = sq(i - 10);
       squareObject.up = above;
       squareObject.upList = this.squares[above].upList.concat([squareId]);
       this.squares[above].down = squareId;
       squareObject.upList.forEach((ID) => {
-        if (ID !== squareId) {
-          this.squares[ID].downList.push(squareId);
-        }
+        this.squares[ID].downList.push(squareId);
       });
     }
     //Updates left, right, leftList, and rightList
+    if (i % 10 === 0) {
+      squareObject.leftList.push(squareId);
+    }
     if (i % 10 !== 0) {
       let left = sq(i - 1);
       squareObject.left = left;
       squareObject.leftList = this.squares[left].leftList.concat([squareId]);
       this.squares[left].right = squareId;
       squareObject.leftList.forEach((ID) => {
-        if (ID !== squareId) {
-          this.squares[ID].rightList.push(squareId);
-        }
+        this.squares[ID].rightList.push(squareId);
       });
     }
     return squareObject;
@@ -189,8 +191,13 @@ function initialize() {
   orientation = "leftRight";
   orientButton = document.createElement("button");
   orientButton.setAttribute("id", "orient-button");
-  orientButton.innerText = "Rotate";
+  "Rotate".split("").forEach((letter) => {
+    let letterDiv = document.createElement("div");
+    letterDiv.textContent = letter;
+    orientButton.appendChild(letterDiv);
+  });
   orientButton.addEventListener("click", () => {
+    orientButton.classList.toggle("rotated-button");
     orientation === "leftRight"
       ? (orientation = "upDown")
       : (orientation = "leftRight");

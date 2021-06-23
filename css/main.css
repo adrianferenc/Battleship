@@ -16,7 +16,12 @@ body {
   transform: scale(1.25);
 }
 
-.square, .unplayed-square, .hit-square, .miss-square, .occupied-square, .sunk-square {
+.square,
+.unplayed-square,
+.hit-square,
+.miss-square,
+.occupied-square,
+.sunk-square {
   display: grid;
   border: 0.5pt solid black;
   background-color: royalblue;
@@ -41,6 +46,17 @@ body {
 .selected-ship {
   display: flex;
   transform: scale(1.1);
+}
+
+#orient-button {
+  display: flex;
+  /* flex-direction: column; */
+  justify-content: center;
+  align-items: center;
+}
+
+.rotated-button {
+  flex-direction: column;
 }
 
 #buttons {
