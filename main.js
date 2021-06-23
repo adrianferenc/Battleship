@@ -32,6 +32,153 @@ let player,
   winner,
   shipyardDisplay;
 
+/*----- cached element references -----*/
+//  const playerBoardDom = document.querySelector("player-board");
+// const aiBoard = document.querySelector("ai-board");
+// const shipyard = document.querySelector("shipyard");
+
+/*----- classes -----*/
+class Square {
+  constructor(id) {
+    this.class = "square";
+    this.id = `square-${id}`;
+    this.up = null;
+    this.down = null;
+    this.left = null;
+    this.right = null;
+    this.upList = [];
+    this.downList = [];
+    this.leftList = [];
+    this.rightList = [];
+    this.attacked = false;
+    this.occupied = false;
+  }
+}
+
+class Board {
+  constructor(name) {
+    this.name = name;
+    this.squares = {};
+    this.ships = {};
+    this.remainingShips = 5;
+  }
+
+  buildBoard() {
+    let board = document.createElement("div");
+    board.setAttribute("class", "board");
+    board.setAttribute("id", `${this.name}-board`);
+    for (let i = 0; i < 100; i++) {
+      let newSquare = this.squares[sq(i)]; //THIS IS THE MAJOR PROBLEM.
+      let squareDiv = document.createElement("div");
+      squareDiv.setAttribute("class", newSquare.class);
+      squareDiv.setAttribute("id", newSquare.id);
+      board.appendChild(squareDiv);
+    }
+    return board;
+  }
+
+  createSquare(i) {
+    let squareId = sq(i);
+    let squareObject = new Square(i);
+    this.squares[squareId] = squareObject;
+    //Updates up, down, upList, and downList
+    if (i >= 10) {
+      let above = sq(i - 10);
+      squareObject.up = above;
+      squareObject.upList = this.squares[above].upList.concat([squareId]);
+      this.squares[above].down = squareId;
+      squareObject.upList.forEach((ID) => {
+        if (ID !== squareId) {
+          this.squares[ID].downList.push(squareId);
+        }
+      });
+    }
+    //Updates left, right, leftList, and rightList
+    if (i % 10 !== 0) {
+      let left = sq(i - 1);
+      squareObject.left = left;
+      squareObject.leftList = this.squares[left].leftList.concat([squareId]);
+      this.squares[left].right = squareId;
+      squareObject.leftList.forEach((ID) => {
+        if (ID !== squareId) {
+          this.squares[ID].rightList.push(squareId);
+        }
+      });
+    }
+    return squareObject;
+  }
+}
+
+class Shipyard {
+  constructor() {
+    this.ships = {
+      carrier: {
+        name: "carrier",
+        length: 5,
+        position: [],
+        class: "ship",
+        health: 5,
+      },
+      battleship: {
+        name: "battleship",
+        length: 4,
+        position: [],
+        class: "ship",
+        health: 4,
+      },
+      submarine: {
+        name: "submarine",
+        length: 3,
+        position: [],
+        class: "ship",
+        health: 3,
+      },
+      cruiser: {
+        name: "cruiser",
+        length: 3,
+        position: [],
+        class: "ship",
+        health: 3,
+      },
+      destroyer: {
+        name: "destroyer",
+        length: 2,
+        position: [],
+        class: "ship",
+        health: 2,
+      },
+    };
+  }
+
+  buildShipyard() {
+    let shipyard = document.createElement("div");
+    shipyard.setAttribute("id", "shipyard");
+    for (let ship in this.ships) {
+      let shipDiv = this.buildShip(ship);
+      shipyard.appendChild(shipDiv);
+    }
+    return shipyard;
+  }
+
+  buildShip(shipName) {
+    let thisShip = this.ships[shipName];
+    let newShip = document.createElement("div");
+    newShip.setAttribute("id", shipName);
+    newShip.setAttribute("class", thisShip.class);
+    for (let i = 0; i < thisShip.length; i++) {
+      let shipSquare = document.createElement("div");
+      shipSquare.setAttribute("id", `${shipName}-${i}`);
+      shipSquare.setAttribute("class", "ship-square");
+      newShip.addEventListener("click", selectAShip);
+      newShip.appendChild(shipSquare);
+    }
+    return newShip;
+  }
+}
+
+/*----- functions -----*/
+function initialize() {
+  document.body.innerHTML = "";
   //This starts the game and initializes all necessary variables.
   player = new Board("player");
   shipyard = new Shipyard();
