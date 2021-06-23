@@ -1,5 +1,7 @@
 # Battleship
 
+The game Battleship is created with HTML, CSS, and Javascript.
+
 # How The Game Is Played:
 In this game, you will play battleship against an AI. The game works in 2 main stages. The first stage is where the human player places their 5 ships onto their 10x10 grid. Then the second stage starts where each player (human player & AI) go back and forth picking squares on the grid where they believe their opponent has put a ship. When an entire ship is sunk, the other player is alerted. The game proceeds until one player's ships are all sunk, at which point the other player wins.
 
@@ -13,6 +15,28 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 - The film was originally set to be filmed off Australia's Gold Coast. Due to problems with government tax incentives, filming moved to Hawaii.
 - Jeremy Renner was cast as Alex Hopper, but dropped out to co-star in The Master (2012), of which he also dropped out.
 - The spectrum analyzer used to get the transmission through is an Anritsu MS2713E Spectrum Master.
+
+## To do
+- sort app's state variables 
+- fix the right/left/etc. of the squares.
+- have them update when attacks have been made.
+- improve ai to use that data.
+- have ai when choosing randomly to only use even squares.
+- For CSS:
+	- group like-elements into the same div, instead of just into the body.
+		- examples are board + shipyard, board + board, buttons, etc. 
+	- fix size of battleship board
+	- fix size of shipyard 
+
+
+
+## Icebox
+- set names of cached elements to define dom elements faster.
+- Put outlines around the outside of the ships using border-top-style, border-left-style, etc.
+- Let rotate button change shipyard flex-direction to row and flex-direction of the ships to column. Clicking rotate again would undo this.
+- If in stage 1, clicking on a ship that has been placed removes it from the board and puts it back at the top of the shipyard.
+
+
 
 ## My Game
 
