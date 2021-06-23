@@ -299,6 +299,7 @@ function render() {
     playAgainButton.textContent = "Play again";
     playAgainButton.addEventListener("click", () => startRound());
     winnerBox.appendChild(winningStatement);
+    winnerBox.appendChild(scores);
     winnerBox.appendChild(playAgainStatement);
     winnerBox.appendChild(playAgainButton);
   }
