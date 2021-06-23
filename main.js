@@ -223,10 +223,6 @@ function initializeStageTwo() {
   render();
 }
 
-function startRound() {
-  //This starts a particular game of battleship.
-}
-
 function getWinner() {
   //This checks if a player has won
   if (ai.remainingShips === 0) {
@@ -263,7 +259,7 @@ function render() {
     let playAgainStatement = document.createElement("h2");
     playAgainStatement.textContent = "Would you like to play again?";
     let playAgainButton = document.createElement("button");
-    playAgainButton.textContent("Play again");
+    playAgainButton.textContent = "Play again";
     playAgainButton.addEventListener("click", () => initialize());
     document.body.appendChild(winningStatement);
     document.body.appendChild(playAgainStatement);
