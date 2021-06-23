@@ -7,6 +7,11 @@ const possibleShips = {
   destroyer: { name: "destroyer", length: 2 },
 };
 
+const other = {
+    player:'ai',
+    ai: 'player'
+}
+
 /*----- app's state (variables) -----*/
 let player,
   shipyard,
@@ -103,16 +108,41 @@ class Board {
 class Shipyard {
   constructor() {
     this.ships = {
-      carrier: { name: "carrier", length: 5, position: [], class: "ship" },
+      carrier: {
+        name: "carrier",
+        length: 5,
+        position: [],
+        class: "ship",
+        health: 5,
+      },
       battleship: {
         name: "battleship",
         length: 4,
         position: [],
         class: "ship",
+        health: 4,
       },
-      submarine: { name: "submarine", length: 3, position: [], class: "ship" },
-      cruiser: { name: "cruiser", length: 3, position: [], class: "ship" },
-      destroyer: { name: "destroyer", length: 2, position: [], class: "ship" },
+      submarine: {
+        name: "submarine",
+        length: 3,
+        position: [],
+        class: "ship",
+        health: 3,
+      },
+      cruiser: {
+        name: "cruiser",
+        length: 3,
+        position: [],
+        class: "ship",
+        health: 3,
+      },
+      destroyer: {
+        name: "destroyer",
+        length: 2,
+        position: [],
+        class: "ship",
+        health: 2,
+      },
     };
   }
 
@@ -147,6 +177,7 @@ function initialize() {
   //This starts the game and initializes all necessary variables.
   player = new Board("player");
   shipyard = new Shipyard();
+  console.log(player);
   for (let i = 0; i < 100; i++) {
     player.createSquare(i);
   }
@@ -213,18 +244,9 @@ function render() {
     playerBoard = player.buildBoard();
     document.body.appendChild(playerBoard);
     document.body.appendChild(aiBoard);
+    aiBoard.addEventListener("click", (e) => attackASquare(e));
   }
 }
-
-// function updateSquares(){
-//     for (let square in player.squares){
-//         console.log(square);
-//         if (square.occupied){
-//             console.log(square);
-//             square.class = 'occupied-square';
-//         }
-//     }
-// }
 
 function sq(i) {
   return `square-${i}`;
@@ -267,11 +289,6 @@ function placeAIShips() {
       randomSquare = Math.floor(Math.random() * 100);
       randomOrientation = ["leftRight", "upDown"][Math.round(Math.random())];
     } while (!isPlaceable(ship, randomSquare, ai, randomOrientation));
-    console.log(ship);
-    console.log(randomSquare);
-    console.log(ai);
-    console.log(randomOrientation);
-    console.log(isPlaceable(ship, randomSquare, ai, randomOrientation));
     let length = aiShipyard.ships[ship].length;
     if (randomOrientation === "leftRight") {
       for (let j = 0; j < length; j++) {
@@ -304,7 +321,11 @@ function isPlaceable(ship, i, side, orientation) {
     let length = possibleShips[ship].length;
     if (orientation === "leftRight") {
       for (let j = 0; j < length; j++) {
-        if (side.squares[sq(i + j)].occupied || (i + j) % 10 < i % 10) {
+        if (
+          i + j >= 100 ||
+          side.squares[sq(i + j)].occupied ||
+          (i + j) % 10 < i % 10
+        ) {
           return false;
         }
       }
@@ -320,10 +341,51 @@ function isPlaceable(ship, i, side, orientation) {
   }
 }
 
+function attackASquare(e) {
+  if (turn % 2 === 1) {
+    if (!ai.squares[e.target.id].attacked) {
+      checkHit(ai, e.target.id);
+      turn++;
+      render();
+      AIAttacks();
+    }
+  }
+}
+
+function checkHit(side, square) {
+  side.squares[square].attacked = true;
+  if (side.squares[square].occupied) {
+    side.squares[square].class = "hit-square";
+    for (let ship in side.ships) {
+      if (side.ships[ship].position.includes(unsquare(square))) {
+        console.log(ship);
+        side.ships[ship].health--;
+        if (side.ships[ship].health === 0) {
+          sinkShip(ship, side);
+        }
+      }
+    }
+  } else {
+    side.squares[square].class = "miss-square";
+  }
+}
+
+function sinkShip(ship, side) {
+  for (let id of side.ships[ship].position) {
+    side.squares[sq(id)].class = "sunk-square";
+  }
+  console.log(`${other[side.name].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`)
+}
+
+function AIAttacks() {
+  if (turn % 2 === 0) {
+    do {
+      randomSquare = Math.floor(Math.random() * 100);
+    } while (player.squares[sq(randomSquare)].attacked);
+    checkHit(player, sq(randomSquare));
+    turn++;
+    render();
+  }
+}
+
 initialize();
-
-/*----- event listeners -----*/
-
-// let ai = new Board("ai", true);
-// ai.buildBoard();
-// ai.squares["ai2"].occupied = true;
