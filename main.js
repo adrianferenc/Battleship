@@ -28,6 +28,7 @@ let player,
   turn,
   gameUpdate,
   gameUpdater,
+  gameUpdaterTitle,
   randomOrientation,
   winner,
   shipyardDisplay;
@@ -180,15 +181,8 @@ class Shipyard {
 
 /*----- functions -----*/
 function initialize() {
-  document.body.innerHTML = "";
-  //This starts the game and initializes all necessary variables.
-  player = new Board("player");
-  shipyard = new Shipyard();
-  for (let i = 0; i < 100; i++) {
-    player.createSquare(i);
-  }
-  placedShips = {};
-  orientation = "leftRight";
+  playerScore = 0;
+  aiScore = 0;
   orientButton = document.createElement("button");
   orientButton.setAttribute("id", "orient-button");
   "Rotate".split("").forEach((letter) => {
@@ -196,6 +190,7 @@ function initialize() {
     letterDiv.textContent = letter;
     orientButton.appendChild(letterDiv);
   });
+
   orientButton.addEventListener("click", () => {
     orientButton.classList.toggle("rotated-button");
     orientation === "leftRight"
@@ -212,16 +207,39 @@ function initialize() {
     render();
   });
   buttons = document.createElement("div");
+  startRound();
+}
+
+function startRound() {
+  document.body.innerHTML = "";
+  player = new Board("player");
+  shipyard = new Shipyard();
+  for (let i = 0; i < 100; i++) {
+    player.createSquare(i);
+  }
+  placedShips = {};
+  orientation = "leftRight";
   buttons.setAttribute("id", "buttons");
   buttons.appendChild(orientButton);
   buttons.appendChild(startButton);
   stage = 1;
-  render(player, shipyard, ai);
+  render();
 }
 
 function initializeStageTwo() {
   playerBoard.removeEventListener("click", (e) => squareClicker(e));
-  gameUpdater = document.createElement("h2");
+  gameUpdate = [, "No new updates"];
+  gameUpdater = document.createElement("div");
+  gameUpdater.setAttribute("id", "game-updater");
+  gameUpdaterTitle = document.createElement("h1");
+  gameUpdaterTitle.textContent = "Game Updates";
+  gameUpdater.appendChild(gameUpdaterTitle);
+
+  gameUpdate1 = document.createElement("h2");
+  gameUpdate2 = document.createElement("h2");
+  gameUpdater.appendChild(gameUpdate1);
+  gameUpdater.appendChild(gameUpdate2);
+
   ai = new Board("ai");
   for (let i = 0; i < 100; i++) {
     ai.createSquare(i);
@@ -236,10 +254,12 @@ function getWinner() {
   //This checks if a player has won
   if (ai.remainingShips === 0) {
     stage = 3;
+    playerScore++;
     return "You won!";
   }
   if (player.remainingShips === 0) {
     stage = 3;
+    aiScore++;
     return "The AI won! :(";
   }
 }
@@ -260,21 +280,27 @@ function render() {
     playerBoard = player.buildBoard();
     document.body.appendChild(playerBoard);
     document.body.appendChild(aiBoard);
-    gameUpdater.textContent = gameUpdate;
+    gameUpdate1.textContent = gameUpdate[0];
+    gameUpdate2.textContent = gameUpdate[1];
     document.body.appendChild(gameUpdater);
     aiBoard.addEventListener("click", (e) => attackASquare(e));
   } else {
     document.body.innerHTML = "";
+    let winnerBox = document.createElement("div");
+    winnerBox.setAttribute("id", "winner-box");
+    document.body.appendChild(winnerBox);
     let winningStatement = document.createElement("h1");
     winningStatement.textContent = winner;
+    let scores = document.createElement("h2");
+    scores.textContent = `Player score: ${playerScore} AI score: ${aiScore}`;
     let playAgainStatement = document.createElement("h2");
     playAgainStatement.textContent = "Would you like to play again?";
     let playAgainButton = document.createElement("button");
     playAgainButton.textContent = "Play again";
-    playAgainButton.addEventListener("click", () => initialize());
-    document.body.appendChild(winningStatement);
-    document.body.appendChild(playAgainStatement);
-    document.body.appendChild(playAgainButton);
+    playAgainButton.addEventListener("click", () => startRound());
+    winnerBox.appendChild(winningStatement);
+    winnerBox.appendChild(playAgainStatement);
+    winnerBox.appendChild(playAgainButton);
   }
 }
 
@@ -370,7 +396,6 @@ function isPlaceable(ship, i, side, orientation) {
 }
 
 function attackASquare(e) {
-  gameUpdate = "";
   if (turn % 2 === 1) {
     if (!ai.squares[e.target.id].attacked) {
       checkHit(ai, e.target.id);
@@ -404,9 +429,11 @@ function sinkShip(ship, side) {
   for (let id of side.ships[ship].position) {
     side.squares[sq(id)].class = "sunk-square";
   }
-  gameUpdate = `${other[
-    side.name
-  ].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`;
+  gameUpdate.unshift(
+    `${other[
+      side.name
+    ].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`
+  );
 }
 
 function AIAttacks() {

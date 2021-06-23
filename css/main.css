@@ -59,6 +59,11 @@ body {
   flex-direction: column;
 }
 
+#game-updater, #winner-box {
+  display: flex;
+  flex-direction: column;
+}
+
 #buttons {
   display: flex;
   flex-direction: column;
