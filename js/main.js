@@ -506,10 +506,6 @@ function feelingAround() {
     [(x) => x + 10, player.squares[downOfFound].downList.length],
   ].sort((x, y) => y[1] - x[1]);
   currentDirection = foundDirection[0][0];
-<<<<<<< HEAD
-
-=======
->>>>>>> main
   return currentDirection;
 }
 
