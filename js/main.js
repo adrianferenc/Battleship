@@ -75,7 +75,7 @@ class Board {
     board.setAttribute("class", "board");
     board.setAttribute("id", `${this.name}-board`);
     for (let i = 0; i < 100; i++) {
-      let newSquare = this.squares[numToId(i)]; //THIS IS THE MAJOR PROBLEM.
+      let newSquare = this.squares[numToId(i)]; 
       let squareDiv = document.createElement("div");
       squareDiv.setAttribute("class", newSquare.class);
       squareDiv.setAttribute("id", newSquare.id);
@@ -321,7 +321,7 @@ function render() {
     winnerBox.setAttribute("id", "winner-box");
     document.body.appendChild(winnerBox);
     let winningStatement = document.createElement("h1");
-    winningStatement.textContent = winner;
+    winningStatement.innerHTML = winner;
     let scores = document.createElement("h2");
     scores.innerHTML = `Player score: ${playerScore}<br/> AI score: ${aiScore}`;
     let playAgainStatement = document.createElement("h2");
@@ -347,7 +347,7 @@ function getWinner() {
   if (player.remainingShips === 0) {
     stage = 3;
     aiScore++;
-    return "The AI won! :(";
+    return "The AI won! &#129302;";
   }
 }
 
