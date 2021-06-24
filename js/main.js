@@ -14,6 +14,7 @@ const other = {
 
 /*----- app's state (variables) -----*/
 let player,
+  currentDirection,
   shipyard,
   ai,
   stage,
@@ -489,22 +490,34 @@ function stabInTheDark() {
   return max.id[Math.floor(Math.random() * max.id.length)];
 }
 
+function feelingAround() {
+  let leftOfFound =
+    unsquare(found[found.length - 1]) % 10 !== 0 ? sq(unsquare(found[found.length - 1]) - 1) : 0;
+  let rightOfFound =
+    unsquare(found[found.length - 1]) % 10 !== 9 ? sq(unsquare(found[found.length - 1]) + 1) : 0;
+  let upOfFound =
+    unsquare(found[found.length - 1]) >= 10 ? sq(unsquare(found[found.length - 1]) - 10) : 0;
+  let downOfFound =
+    unsquare(found[found.length - 1]) < 90 ? sq(unsquare(found[found.length - 1]) + 10) : 0;
+  let foundDirection = [
+    [(x) => x - 1, player.squares[leftOfFound].leftList.length],
+    [(x) => x + 1, player.squares[rightOfFound].rightList.length],
+    [(x) => x - 10, player.squares[upOfFound].upList.length],
+    [(x) => x + 10, player.squares[downOfFound].downList.length],
+  ].sort((x, y) => y[1] - x[1]);
+  currentDirection = foundDirection[0][0];
+  return currentDirection;
+}
+
 function AIAttacks() {
   if (turn % 2 === 0) {
     if (found.length === 0) {
       checkHit(player, stabInTheDark());
-    } else if (found.length === 1) {
-      let leftOfFound = player.squares[found[0]].left;
-      let rightOfFound = player.squares[found[0]].right;
-      let upOfFound = player.squares[found[0]].up;
-      let downOfFound = player.squares[found[0]].down;
-      let sorted = [
-        ["left", player.squares[leftOfFound].leftList.length],
-        ["right", player.squares[rightOfFound].rightList.length],
-        ["up", player.squares[upOfFound].upList.length],
-        ["down", player.squares[downOfFound].downList.length],
-      ].sort((x,y)=> y[1]-x[1]);
-      console.log(sorted);
+    } else if (found.length === 2) {
+      checkHit(player, sq(currentDirection(unsquare(found[1]))));
+    } else {
+      feelingAround();
+      checkHit(player, sq(currentDirection(unsquare(found[0]))));
     }
     turn++;
     max = { max: 0, id: [] };
@@ -532,12 +545,16 @@ function checkHit(side, square) {
           side.remainingShips--;
           if (side.name === "player") {
             found = [];
+            currentDirection = undefined;
           }
         }
       }
     }
   } else {
     side.squares[square].class = "miss-square";
+    if (found.length > 1) {
+      found = [found[0]];
+    }
   }
   updateSquares(side, square);
 }
