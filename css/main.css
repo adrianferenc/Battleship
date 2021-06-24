@@ -1,17 +1,42 @@
-body, .ship, .selected-ship, #orient-button, #game-updater, #winner-box, .rotated-button, #buttons, #shipyard {
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+
+body {
+  font-family: "Share Tech Mono", monospace;
+}
+
+button {
+  font-family: inherit;
+  font-size: 1em;
+}
+
+#main-stage,
+#stage-one,
+.ship,
+.selected-ship,
+#orient-button,
+#game-updater,
+#winner-box,
+.rotated-button,
+#shipyard {
   display: flex;
 }
 
-body {
+#main-stage {
   /* This will be made into its own div or something, this is just so the boards show up separately */
   justify-content: space-around;
+  align-items: center;
+}
+
+#game-updates {
+  height: 400px;
+  overflow-y: scroll;
 }
 
 .board {
   display: grid;
   grid-template: auto auto auto auto auto auto auto auto auto auto / auto auto auto auto auto auto auto auto auto auto;
-  height: 200px;
-  width: 300px;
+  height: 300px;
+  width: 500px;
   margin: 0;
 }
 
@@ -50,21 +75,31 @@ body {
   transform: scale(1.1);
 }
 
-#orient-button {
+#orient-button,
+#game-updater,
+#winner-box,
+#stage-one {
   justify-content: center;
   align-items: center;
 }
 
-#game-updater, #winner-box, .rotated-button, #buttons, #shipyard {
-  flex-direction: column;
+#play-again-button {
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
 }
 
-#buttons {
-  justify-content: space-evenly;
+#game-updater,
+#stage-one,
+#winner-box,
+.rotated-button,
+#shipyard {
+  flex-direction: column;
 }
 
 #shipyard {
   justify-content: space-between;
+  height: 300px;
 }
 
 .ship-square {
@@ -72,4 +107,33 @@ body {
   width: 20px;
   background-color: gray;
   border: 1pt solid black;
+}
+
+#start-button {
+  height: 50px;
+  width: 80%;
+}
+
+#start-button:enabled {
+  border-radius: 5px;
+  background-color: green;
+  font-size: 20px;
+  color: white;
+  font-weight: bold;
+}
+
+#stage-one > #main-stage {
+  display: grid;
+  grid-template-columns: 1fr 107.328pt auto;
+  column-gap: 100px;
+}
+
+#button-box {
+  display: flex;
+  justify-content: center;
+}
+
+.rotated-button {
+  width: 15pt;
+  height: 85pt;
 }
