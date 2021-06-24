@@ -491,19 +491,33 @@ function stabInTheDark() {
 }
 
 function feelingAround() {
-  let leftOfFound =
-    unsquare(found[found.length - 1]) % 10 !== 0 ? sq(unsquare(found[found.length - 1]) - 1) : 0;
-  let rightOfFound =
-    unsquare(found[found.length - 1]) % 10 !== 9 ? sq(unsquare(found[found.length - 1]) + 1) : 0;
-  let upOfFound =
-    unsquare(found[found.length - 1]) >= 10 ? sq(unsquare(found[found.length - 1]) - 10) : 0;
-  let downOfFound =
-    unsquare(found[found.length - 1]) < 90 ? sq(unsquare(found[found.length - 1]) + 10) : 0;
+  let leftOfFound = sq(unsquare(found[found.length - 1]) - 1);
+  let rightOfFound = sq(unsquare(found[found.length - 1]) + 1);
+  let upOfFound = sq(unsquare(found[found.length - 1]) - 10);
+  let downOfFound = sq(unsquare(found[found.length - 1]) + 10);
   let foundDirection = [
-    [(x) => x - 1, player.squares[leftOfFound].leftList.length],
-    [(x) => x + 1, player.squares[rightOfFound].rightList.length],
-    [(x) => x - 10, player.squares[upOfFound].upList.length],
-    [(x) => x + 10, player.squares[downOfFound].downList.length],
+    [
+      (x) => x - 1,
+      player.squares[leftOfFound]
+        ? player.squares[leftOfFound].leftList.length
+        : 0,
+    ],
+    [
+      (x) => x + 1,
+      player.squares[rightOfFound]
+        ? player.squares[rightOfFound].rightList.length
+        : 0,
+    ],
+    [
+      (x) => x - 10,
+      player.squares[upOfFound] ? player.squares[upOfFound].upList.length : 0,
+    ],
+    [
+      (x) => x + 10,
+      player.squares[downOfFound]
+        ? player.squares[downOfFound].downList.length
+        : 0,
+    ],
   ].sort((x, y) => y[1] - x[1]);
   currentDirection = foundDirection[0][0];
   return currentDirection;
@@ -552,7 +566,7 @@ function checkHit(side, square) {
     }
   } else {
     side.squares[square].class = "miss-square";
-    if (found.length > 1) {
+    if (side.name === "player" && found.length > 1) {
       found = [found[0]];
     }
   }
