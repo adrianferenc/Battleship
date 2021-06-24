@@ -1,6 +1,9 @@
+body, .ship, .selected-ship, #orient-button, #game-updater, #winner-box, .rotated-button, #buttons, #shipyard {
+  display: flex;
+}
+
 body {
   /* This will be made into its own div or something, this is just so the boards show up separately */
-  display: flex;
   justify-content: space-around;
 }
 
@@ -12,10 +15,6 @@ body {
   margin: 0;
 }
 
-.unplayed-square:hover {
-  transform: scale(1.25);
-}
-
 .square,
 .unplayed-square,
 .hit-square,
@@ -25,6 +24,10 @@ body {
   display: grid;
   border: 0.5pt solid black;
   background-color: royalblue;
+}
+
+.unplayed-square:hover {
+  transform: scale(1.25);
 }
 
 .occupied-square {
@@ -44,40 +47,24 @@ body {
 }
 
 .selected-ship {
-  display: flex;
   transform: scale(1.1);
 }
 
 #orient-button {
-  display: flex;
-  /* flex-direction: column; */
   justify-content: center;
   align-items: center;
 }
 
-.rotated-button {
-  flex-direction: column;
-}
-
-#game-updater, #winner-box {
-  display: flex;
+#game-updater, #winner-box, .rotated-button, #buttons, #shipyard {
   flex-direction: column;
 }
 
 #buttons {
-  display: flex;
-  flex-direction: column;
   justify-content: space-evenly;
 }
 
 #shipyard {
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
-}
-
-.ship {
-  display: flex;
 }
 
 .ship-square {
