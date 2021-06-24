@@ -1,11 +1,5 @@
 # Battleship
 
-The game Battleship was created with HTML, CSS, and Javascript. It can be played [here.](https://adrianferenc.github.io/Battleship/)
-
-# How The Game Is Played:
-In this game, you play battleship against an AI. The game works in 2 main stages. The first stage is where you place your 5 ships onto the 10x10 grid. In the second stage, each player (you & AI) go back and forth picking squares on the grid where each believe their opponent has put a ship. When an entire ship is sunk, the other player is alerted. The game proceeds until one player's ships are all sunk, at which point the other player wins.
-
-## A Brief History of Battleship:
 The game of Battleship was originally a game played with paper and pencil. It dates back to World War I, where it is questionably disputed if it was created by the French or the Russions.
 
 In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor Kitsch, Alexander Skarsgård, Rihanna, Brooklyn Decker, Tadanobu Asano, and Liam Neeson. It has a 34% rating on Rotten Tomatoes. Some _fun_ facts about the film (via IMDb):
@@ -14,6 +8,30 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 - The film was originally set to be filmed off Australia's Gold Coast. Due to problems with government tax incentives, filming moved to Hawaii.
 - Jeremy Renner was cast as Alex Hopper, but dropped out to co-star in The Master (2012), of which he also dropped out.
 - The spectrum analyzer used to get the transmission through is an Anritsu MS2713E Spectrum Master.
+
+##Screenshots of the game
+<img width="1440" alt="start screen" src="https://user-images.githubusercontent.com/68762863/123341110-41788380-d502-11eb-9e43-228dceaa4de6.png">
+
+<img width="1440" alt="placed ships" src="https://user-images.githubusercontent.com/68762863/123341159-58b77100-d502-11eb-8bbc-04b98c5868d2.png">
+
+<img width="1440" alt="gameplay" src="https://user-images.githubusercontent.com/68762863/123341178-63720600-d502-11eb-9f50-bd4499237248.png">
+
+<img width="1440" alt="game over" src="https://user-images.githubusercontent.com/68762863/123341212-708ef500-d502-11eb-83fb-46b8c0a4bf76.png">
+
+
+## Technologies Used:
+
+The game Battleship was created with HTML, CSS, and Javascript.
+
+## Getting Started
+The game can be played [here.](https://adrianferenc.github.io/Battleship/)
+- To start, click a ship to select it, then click a square on the board to place it. To rotate the ships, click rotate. Once all the ships are placed, press start to play.
+- Once the game starts, click any square on the AI's board (the board on the right). A miss will show up as <span style="color:goldenrod"> goldenrod</span> and a hit shows up as <span style="color:red"> red</span>. When a ship is sunk, it shows up as <span style="color:navy"> navy</span>.
+
+# How The Game Is Played:
+In this game, you play battleship against an AI. The game works in 2 main stages. The first stage is where you place your 5 ships onto the 10x10 grid. In the second stage, each player (you & AI) go back and forth picking squares on the grid where each believe their opponent has put a ship. When an entire ship is sunk, the other player is alerted. The game proceeds until one player's ships are all sunk, at which point the other player wins.
+
+
 
 
 ## Icebox

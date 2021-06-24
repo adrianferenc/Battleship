@@ -42,8 +42,6 @@ let ai,
   update,
   winner;
 
-/*----- cached element references -----*/
-
 /*----- classes -----*/
 class Square {
   constructor(id) {
@@ -88,7 +86,6 @@ class Board {
     let squareId = numToId(i);
     let squareObject = new Square(i);
     this.squares[squareId] = squareObject;
-    //Updates up, down, upList, and downList
     if (i < 10) {
       squareObject.upList.push(squareId);
     }
@@ -101,7 +98,6 @@ class Board {
     squareObject.upList.forEach((ID) => {
       this.squares[ID].downList.push(squareId);
     });
-    //Updates left, right, leftList, and rightList
     if (i % 10 === 0) {
       squareObject.leftList.push(squareId);
     }
@@ -275,7 +271,6 @@ function initializeStageTwo() {
 
 function render() {
   mainStage.innerHTML = "";
-  //This updates the player board, the shipyard, and the ai board
   playerBoard = player.buildBoard();
   if (stage === 1) {
     if (orientation === "leftRight") {
@@ -344,7 +339,6 @@ function render() {
 }
 
 function getWinner() {
-  //This checks if a player has won
   if (ai.remainingShips === 0) {
     stage = 3;
     playerScore++;
@@ -468,7 +462,6 @@ function attackASquare(e) {
 
 function updateSquares(side, square) {
   let i = idToNum(square);
-  //update left, right, up, down:
   if (i % 10 !== 0) {
     side.squares[numToId(i - 1)].right = null;
   }
@@ -481,7 +474,7 @@ function updateSquares(side, square) {
   if (i < 90) {
     side.squares[numToId(i + 10)].up = null;
   }
-  //update lists
+
   for (let j = 0; (10 + i - j) % 10 <= i % 10; j++) {
     side.squares[numToId(i - j)].rightList = side.squares[
       numToId(i - j)
