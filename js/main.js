@@ -13,28 +13,34 @@ const other = {
 };
 
 /*----- app's state (variables) -----*/
-let player,
-  currentDirection,
-  shipyard,
-  ai,
-  stage,
-  selectedShip,
-  orientation,
-  playerBoard,
-  startButton,
-  orientButton,
+let ai,
+buttonBox,
   buttons,
+  currentDirection,
   found,
-  placedShips,
-  randomSquare,
-  max,
-  turn,
   gameUpdate,
-  gameUpdater,
+  gameUpdates,
   gameUpdaterTitle,
+  mainStage,
+  max,
+  orientation,
+  orientButton,
+  placedShips,
+  player,
+  playerBoard,
   randomOrientation,
-  winner,
-  shipyardDisplay;
+  randomSquare,
+  selectedShip,
+  shipyard,
+  shipyardDisplay,
+  stage,
+  stageOne,
+  stageTwo,
+  startButton,
+  title,
+  turn,
+  update,
+  winner;
 
 /*----- cached element references -----*/
 
@@ -184,13 +190,15 @@ function initialize() {
   playerScore = 0;
   aiScore = 0;
   orientButton = document.createElement("button");
+  buttonBox = document.createElement("div");
+  buttonBox.setAttribute('id','button-box');
+  buttonBox.appendChild(orientButton);
   orientButton.setAttribute("id", "orient-button");
   "Rotate".split("").forEach((letter) => {
     let letterDiv = document.createElement("div");
     letterDiv.textContent = letter;
     orientButton.appendChild(letterDiv);
   });
-
   orientButton.addEventListener("click", () => {
     orientButton.classList.toggle("rotated-button");
     orientation === "leftRight"
@@ -206,7 +214,10 @@ function initialize() {
     initializeStageTwo();
     render();
   });
-  buttons = document.createElement("div");
+  title = document.createElement('h1');
+  title.textContent = 'Battleship';
+  mainStage = document.createElement("div");
+  mainStage.setAttribute("id", "main-stage");
   startRound();
 }
 
@@ -225,10 +236,10 @@ function startRound() {
     max: 0,
   };
   found = [];
-  buttons.setAttribute("id", "buttons");
-  buttons.appendChild(orientButton);
-  buttons.appendChild(startButton);
+
   stage = 1;
+  stageOne = document.createElement("div");
+  stageOne.setAttribute("id", "stage-one");
   render();
 }
 
@@ -238,13 +249,12 @@ function initializeStageTwo() {
   gameUpdater = document.createElement("div");
   gameUpdater.setAttribute("id", "game-updater");
   gameUpdaterTitle = document.createElement("h1");
+  gameUpdaterTitle.setAttribute('id','game-updater-title');
   gameUpdaterTitle.textContent = "Game Updates";
   gameUpdater.appendChild(gameUpdaterTitle);
-
-  gameUpdate1 = document.createElement("h2");
-  gameUpdate2 = document.createElement("h2");
-  gameUpdater.appendChild(gameUpdate1);
-  gameUpdater.appendChild(gameUpdate2);
+  gameUpdates = document.createElement("ul");
+  gameUpdates.setAttribute('id','game-updates')
+  gameUpdater.appendChild(gameUpdates);
 
   ai = new Board("ai");
   for (let i = 0; i < 100; i++) {
@@ -253,29 +263,36 @@ function initializeStageTwo() {
   }
   placeAIShips();
   turn = 1;
+  stageTwo = document.createElement("div");
+  stageTwo.setAttribute("id", "stage-two");
   render();
 }
 
 function render() {
-  document.body.innerHTML = "";
+  mainStage.innerHTML = "";
   //This updates the player board, the shipyard, and the ai board
   playerBoard = player.buildBoard();
   if (stage === 1) {
     playerBoard.addEventListener("click", placeAShip);
-    document.body.appendChild(playerBoard);
+    mainStage.appendChild(playerBoard);
     shipyardDisplay = shipyard.buildShipyard();
-    document.body.appendChild(shipyardDisplay);
+    mainStage.appendChild(buttonBox);
+    mainStage.appendChild(shipyardDisplay);
     startButton.disabled = Object.keys(player.ships).length < 5;
-    document.body.appendChild(buttons);
+    stageOne.appendChild(title);
+    stageOne.appendChild(mainStage);
+    stageOne.appendChild(startButton);
+    document.body.appendChild(stageOne);
   } else if (stage === 2) {
+    stageOne.innerHTML = "";
     aiBoard = ai.buildBoard();
-    playerBoard = player.buildBoard();
-    document.body.appendChild(playerBoard);
-    document.body.appendChild(aiBoard);
-    gameUpdate1.textContent = gameUpdate[0];
-    gameUpdate2.textContent = gameUpdate[1];
-    document.body.appendChild(gameUpdater);
     aiBoard.addEventListener("click", (e) => attackASquare(e));
+    playerBoard = player.buildBoard();
+    mainStage.appendChild(playerBoard);
+    mainStage.appendChild(aiBoard);
+    stageTwo.appendChild(mainStage);
+    stageTwo.appendChild(gameUpdater);
+    document.body.appendChild(stageTwo);
   } else {
     document.body.innerHTML = "";
     let winnerBox = document.createElement("div");
@@ -284,11 +301,12 @@ function render() {
     let winningStatement = document.createElement("h1");
     winningStatement.textContent = winner;
     let scores = document.createElement("h2");
-    scores.textContent = `Player score: ${playerScore} AI score: ${aiScore}`;
+    scores.innerHTML = `Player score: ${playerScore}<br/> AI score: ${aiScore}`;
     let playAgainStatement = document.createElement("h2");
     playAgainStatement.textContent = "Would you like to play again?";
     let playAgainButton = document.createElement("button");
-    playAgainButton.textContent = "Play again";
+    playAgainButton.setAttribute('id','play-again-button')
+    playAgainButton.textContent = "Play Again";
     playAgainButton.addEventListener("click", () => startRound());
     winnerBox.appendChild(winningStatement);
     winnerBox.appendChild(scores);
@@ -411,7 +429,7 @@ function attackASquare(e) {
         winner = getWinner();
         render();
         if (!winner) {
-          AIAttacks();
+          setTimeout(AIAttacks,1000);
         }
       }
     }
@@ -546,6 +564,10 @@ function checkHit(side, square) {
   side.squares[square].attacked = true;
   if (side.squares[square].occupied) {
     side.squares[square].class = "hit-square";
+    update = document.createElement("li");
+    update.textContent = `${other[side.name].toUpperCase()} got a hit!`;
+    gameUpdates.prepend(update);
+
     if (side.name === "player") {
       if (found.length === 0) {
         found[0] = square;
@@ -568,6 +590,9 @@ function checkHit(side, square) {
     }
   } else {
     side.squares[square].class = "miss-square";
+    update = document.createElement("li");
+    update.textContent = `${other[side.name].toUpperCase()} missed.`;
+    gameUpdates.prepend(update);
     if (side.name === "player" && found.length > 1) {
       found = [found[0]];
     }
@@ -579,11 +604,12 @@ function sinkShip(ship, side) {
   for (let id of side.ships[ship].position) {
     side.squares[sq(id)].class = "sunk-square";
   }
-  gameUpdate.unshift(
-    `${other[
-      side.name
-    ].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`
-  );
+  update = document.createElement("li");
+  update.style.fontSize = "20pt";
+  update.textContent = `${other[
+    side.name
+  ].toUpperCase()} sunk ${side.name.toUpperCase()}'s ${ship}`;
+  gameUpdates.prepend(update);
 }
 
 initialize();
