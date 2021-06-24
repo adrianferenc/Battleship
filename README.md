@@ -16,23 +16,10 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 - Jeremy Renner was cast as Alex Hopper, but dropped out to co-star in The Master (2012), of which he also dropped out.
 - The spectrum analyzer used to get the transmission through is an Anritsu MS2713E Spectrum Master.
 
-## To do
-- sort app's state variables alphabetically
-- add a fire button
-- update right/left/etc when attacks have been made.
-- improve ai to use right/left/etc data.
-- have ai when choosing randomly to only use even squares.
-- For CSS:
-	- group like-elements into the same div, instead of just into the body.
-		- examples are board + shipyard, board + board, buttons, etc. 
-	- set size of battleship board
-	- set size of shipyard 
-
-
 
 ## Icebox
-- set names of cached elements to define dom elements faster.
-- Put outlines around the outside of the ships using border-top-style, border-left-style, etc.
+- Set names of cached elements to define dom elements faster.
+- Put outlines around the outside of the ships when placed on the board using border-top-style, border-left-style, etc.
 - Let rotate button change shipyard flex-direction to row and flex-direction of the ships to column. Clicking rotate again would undo this.
 - If in stage 1, clicking on a ship that has been placed removes it from the board and puts it back at the top of the shipyard.
 
@@ -115,10 +102,6 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 
 
 
-Play [here!](https://www.google.com/search?q=battleship)
+Play [here!](https://pages.git.generalassemb.ly/adrianferenc/adrianferenc.github.io/)
 
 Wireframes: [Game setup](https://wireframe.cc/1ksKgk) [Gameplay](https://wireframe.cc/ierRfK)
-
-
-<!--###Future features
-- codes! typing in ttt turns it into a tic tac toe game?-->

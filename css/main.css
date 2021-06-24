@@ -12,12 +12,11 @@ button {
 #main-stage,
 #stage-one,
 .ship,
-.selected-ship,
 #orient-button,
 #game-updater,
 #winner-box,
-.rotated-button,
-#shipyard {
+.rotated-button
+ {
   display: flex;
 }
 
@@ -72,6 +71,7 @@ button {
 }
 
 .selected-ship {
+  display: flex;
   transform: scale(1.1);
 }
 
@@ -92,14 +92,8 @@ button {
 #game-updater,
 #stage-one,
 #winner-box,
-.rotated-button,
-#shipyard {
+.rotated-button {
   flex-direction: column;
-}
-
-#shipyard {
-  justify-content: space-between;
-  height: 300px;
 }
 
 .ship-square {
@@ -136,4 +130,35 @@ button {
 .rotated-button {
   width: 15pt;
   height: 85pt;
+}
+
+
+
+.shipyardRL {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 300px;
+  width: 300px;
+}
+
+.shipyardUD {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 300px;
+  width: 300px;
+}
+
+.ship-rotated {
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-ship-rotated {
+  display: flex;
+  flex-direction: column;
+  transform: scale(1.1);
 }
