@@ -14,6 +14,7 @@ const other = {
 
 /*----- app's state (variables) -----*/
 let player,
+  currentDirection,
   shipyard,
   ai,
   stage,
@@ -23,8 +24,10 @@ let player,
   startButton,
   orientButton,
   buttons,
+  found,
   placedShips,
   randomSquare,
+  max,
   turn,
   gameUpdate,
   gameUpdater,
@@ -34,9 +37,6 @@ let player,
   shipyardDisplay;
 
 /*----- cached element references -----*/
-//  const playerBoardDom = document.querySelector("player-board");
-// const aiBoard = document.querySelector("ai-board");
-// const shipyard = document.querySelector("shipyard");
 
 /*----- classes -----*/
 class Square {
@@ -91,10 +91,10 @@ class Board {
       squareObject.up = above;
       squareObject.upList = this.squares[above].upList.concat([squareId]);
       this.squares[above].down = squareId;
-      squareObject.upList.forEach((ID) => {
-        this.squares[ID].downList.push(squareId);
-      });
     }
+    squareObject.upList.forEach((ID) => {
+      this.squares[ID].downList.push(squareId);
+    });
     //Updates left, right, leftList, and rightList
     if (i % 10 === 0) {
       squareObject.leftList.push(squareId);
@@ -104,10 +104,10 @@ class Board {
       squareObject.left = left;
       squareObject.leftList = this.squares[left].leftList.concat([squareId]);
       this.squares[left].right = squareId;
-      squareObject.leftList.forEach((ID) => {
-        this.squares[ID].rightList.push(squareId);
-      });
     }
+    squareObject.leftList.forEach((ID) => {
+      this.squares[ID].rightList.push(squareId);
+    });
     return squareObject;
   }
 }
@@ -214,11 +214,17 @@ function startRound() {
   document.body.innerHTML = "";
   player = new Board("player");
   shipyard = new Shipyard();
+  orientButton.classList.remove("rotated-button");
   for (let i = 0; i < 100; i++) {
     player.createSquare(i);
   }
   placedShips = {};
   orientation = "leftRight";
+  max = {
+    id: [],
+    max: 0,
+  };
+  found = [];
   buttons.setAttribute("id", "buttons");
   buttons.appendChild(orientButton);
   buttons.appendChild(startButton);
@@ -410,13 +416,112 @@ function attackASquare(e) {
   }
 }
 
+function updateSquares(side, square) {
+  let i = unsquare(square);
+  //update left, right, up, down:
+  if (i % 10 !== 0) {
+    side.squares[sq(i - 1)].right = null;
+  }
+  if (i % 10 !== 9) {
+    side.squares[sq(i + 1)].left = null;
+  }
+  if (i >= 10) {
+    side.squares[sq(i - 10)].down = null;
+  }
+  if (i < 90) {
+    side.squares[sq(i + 10)].up = null;
+  }
+  //update lists
+  for (let j = 0; (10 + i - j) % 10 <= i % 10; j++) {
+    side.squares[sq(i - j)].rightList = side.squares[sq(i - j)].rightList.slice(
+      0,
+      side.squares[sq(i - j)].rightList.indexOf(square)
+    );
+    if ((i - j) % 10 === 0 && j > 0) {
+      break;
+    }
+  }
+
+  for (let j = 0; i % 10 <= (i + j) % 10 && i + j < 100; j++) {
+    side.squares[sq(i + j)].leftList = side.squares[sq(i + j)].leftList.slice(
+      side.squares[sq(i + j)].leftList.indexOf(square) + 1
+    );
+    if ((i + j) % 10 === 0 && j > 0) {
+      break;
+    }
+  }
+
+  for (let j = 0; i - 10 * j >= 0; j++) {
+    side.squares[sq(i - 10 * j)].downList = side.squares[
+      sq(i - 10 * j)
+    ].downList.slice(0, side.squares[sq(i - 10 * j)].downList.indexOf(square));
+    if (i - 10 * j < 10) {
+      break;
+    }
+  }
+  for (let j = 0; i + 10 * j < 100; j++) {
+    side.squares[sq(i + 10 * j)].upList = side.squares[
+      sq(i + 10 * j)
+    ].upList.slice(side.squares[sq(i + 10 * j)].upList.indexOf(square) + 1);
+  }
+}
+
+function stabInTheDark() {
+  for (let i = 0; i < 100; i++) {
+    let total =
+      Math.min(player.squares[sq(i)].leftList.length, 5) +
+      Math.min(player.squares[sq(i)].rightList.length, 5) +
+      Math.min(player.squares[sq(i)].downList.length, 5) +
+      Math.min(player.squares[sq(i)].upList.length, 5);
+    if (total > max.max) {
+      max.max = total;
+    }
+  }
+  for (let i = 0; i < 100; i++) {
+    let total =
+      Math.min(player.squares[sq(i)].leftList.length, 5) +
+      Math.min(player.squares[sq(i)].rightList.length, 5) +
+      Math.min(player.squares[sq(i)].downList.length, 5) +
+      Math.min(player.squares[sq(i)].upList.length, 5);
+    if (total === max.max) {
+      max.id.push(sq(i));
+    }
+  }
+  return max.id[Math.floor(Math.random() * max.id.length)];
+}
+
+function feelingAround() {
+  let leftOfFound =
+    unsquare(found[found.length - 1]) % 10 !== 0 ? sq(unsquare(found[found.length - 1]) - 1) : 0;
+  let rightOfFound =
+    unsquare(found[found.length - 1]) % 10 !== 9 ? sq(unsquare(found[found.length - 1]) + 1) : 0;
+  let upOfFound =
+    unsquare(found[found.length - 1]) >= 10 ? sq(unsquare(found[found.length - 1]) - 10) : 0;
+  let downOfFound =
+    unsquare(found[found.length - 1]) < 90 ? sq(unsquare(found[found.length - 1]) + 10) : 0;
+  let foundDirection = [
+    [(x) => x - 1, player.squares[leftOfFound].leftList.length],
+    [(x) => x + 1, player.squares[rightOfFound].rightList.length],
+    [(x) => x - 10, player.squares[upOfFound].upList.length],
+    [(x) => x + 10, player.squares[downOfFound].downList.length],
+  ].sort((x, y) => y[1] - x[1]);
+  currentDirection = foundDirection[0][0];
+
+  return currentDirection;
+}
+
 function AIAttacks() {
   if (turn % 2 === 0) {
-    do {
-      randomSquare = Math.floor(Math.random() * 100);
-    } while (player.squares[sq(randomSquare)].attacked);
-    checkHit(player, sq(randomSquare));
+    if (found.length === 0) {
+      checkHit(player, stabInTheDark());
+    } else if (found.length === 2) {
+      checkHit(player, sq(currentDirection(unsquare(found[1]))));
+    } else {
+      feelingAround();
+      checkHit(player, sq(currentDirection(unsquare(found[0]))));
+    }
     turn++;
+    max = { max: 0, id: [] };
     winner = getWinner();
     render();
   }
@@ -426,18 +531,33 @@ function checkHit(side, square) {
   side.squares[square].attacked = true;
   if (side.squares[square].occupied) {
     side.squares[square].class = "hit-square";
+    if (side.name === "player") {
+      if (found.length === 0) {
+        found[0] = square;
+      } else {
+        found[1] = square;
+      }
+    }
     for (let ship in side.ships) {
       if (side.ships[ship].position.includes(unsquare(square))) {
         side.ships[ship].health--;
         if (side.ships[ship].health === 0) {
           sinkShip(ship, side);
           side.remainingShips--;
+          if (side.name === "player") {
+            found = [];
+            currentDirection = undefined;
+          }
         }
       }
     }
   } else {
     side.squares[square].class = "miss-square";
+    if (found.length > 1) {
+      found = [found[0]];
+    }
   }
+  updateSquares(side, square);
 }
 
 function sinkShip(ship, side) {
