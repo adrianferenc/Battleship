@@ -75,7 +75,7 @@ class Board {
     board.setAttribute("class", "board");
     board.setAttribute("id", `${this.name}-board`);
     for (let i = 0; i < 100; i++) {
-      let newSquare = this.squares[numToId(i)]; 
+      let newSquare = this.squares[numToId(i)];
       let squareDiv = document.createElement("div");
       squareDiv.setAttribute("class", newSquare.class);
       squareDiv.setAttribute("id", newSquare.id);
@@ -125,35 +125,35 @@ class Shipyard {
         name: "carrier",
         length: 5,
         position: [],
-        class: orientation === 'ship',
+        class: orientation === "ship",
         health: 5,
       },
       battleship: {
         name: "battleship",
         length: 4,
         position: [],
-        class: orientation === 'ship',
+        class: orientation === "ship",
         health: 4,
       },
       submarine: {
         name: "submarine",
         length: 3,
         position: [],
-        class: orientation === 'ship',
+        class: orientation === "ship",
         health: 3,
       },
       cruiser: {
         name: "cruiser",
         length: 3,
         position: [],
-        class: orientation === 'ship',
+        class: orientation === "ship",
         health: 3,
       },
       destroyer: {
         name: "destroyer",
         length: 2,
         position: [],
-        class: orientation === 'ship',
+        class: orientation === "ship",
         health: 2,
       },
     };
@@ -228,7 +228,7 @@ function startRound() {
     orientation === "leftRight"
       ? (orientation = "upDown")
       : (orientation = "leftRight");
-      
+
     render();
   });
   orientButton.classList.remove("rotated-button");
@@ -278,23 +278,29 @@ function render() {
   //This updates the player board, the shipyard, and the ai board
   playerBoard = player.buildBoard();
   if (stage === 1) {
-    if (orientation ==='leftRight'){
-      for (let ship in shipyard.ships){
-        if (!!shipyard.ships[ship].class && shipyard.ships[ship].class.includes('selected-ship')){
-        shipyard.ships[ship].class = 'selected-ship';
-      } else {
-        shipyard.ships[ship].class = 'ship';
-      }
-     }
-     } else if (orientation ==='upDown') {
-      for (let ship in shipyard.ships){
-        if (!!shipyard.ships[ship].class && shipyard.ships[ship].class.includes('selected-ship')){
-          shipyard.ships[ship].class = 'selected-ship-rotated';
+    if (orientation === "leftRight") {
+      for (let ship in shipyard.ships) {
+        if (
+          !!shipyard.ships[ship].class &&
+          shipyard.ships[ship].class.includes("selected-ship")
+        ) {
+          shipyard.ships[ship].class = "selected-ship";
         } else {
-          shipyard.ships[ship].class = 'ship-rotated';
+          shipyard.ships[ship].class = "ship";
         }
       }
+    } else if (orientation === "upDown") {
+      for (let ship in shipyard.ships) {
+        if (
+          !!shipyard.ships[ship].class &&
+          shipyard.ships[ship].class.includes("selected-ship")
+        ) {
+          shipyard.ships[ship].class = "selected-ship-rotated";
+        } else {
+          shipyard.ships[ship].class = "ship-rotated";
+        }
       }
+    }
     shipyardDisplay = shipyard.buildShipyard();
     playerBoard.addEventListener("click", placeAShip);
     mainStage.appendChild(playerBoard);
@@ -437,7 +443,7 @@ function selectAShip(e) {
   if (selectedShip) {
     shipyard.ships[selectedShip].class =
       orientation === "leftRight" ? "ship" : "ship-rotated";
-  } 
+  }
   selectedShip = e.target.id.split("-")[0];
   shipyard.ships[selectedShip].class =
     orientation === "leftRight" ? "selected-ship" : "selected-ship-rotated";
