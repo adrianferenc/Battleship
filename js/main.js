@@ -346,7 +346,7 @@ function isPlaceable(ship, i, side, orientation) {
 
 function placeAShip(e) {
   let i = unsquare(e.target.id);
-  if (selectedShip) {
+  if (selectedShip && e.target.className === "square") {
     let length = shipyard.ships[selectedShip].length;
     if (selectedShip && isPlaceable(selectedShip, i, player, orientation)) {
       if (orientation === "leftRight") {
@@ -404,13 +404,15 @@ function selectAShip(e) {
 
 function attackASquare(e) {
   if (turn % 2 === 1) {
-    if (!ai.squares[e.target.id].attacked) {
-      checkHit(ai, e.target.id);
-      turn++;
-      winner = getWinner();
-      render();
-      if (!winner) {
-        AIAttacks();
+    if (e.target.className === "unplayed-square") {
+      if (!ai.squares[e.target.id].attacked) {
+        checkHit(ai, e.target.id);
+        turn++;
+        winner = getWinner();
+        render();
+        if (!winner) {
+          AIAttacks();
+        }
       }
     }
   }
