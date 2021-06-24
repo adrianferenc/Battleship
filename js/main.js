@@ -251,7 +251,7 @@ function initializeStageTwo() {
   gameUpdater.setAttribute("id", "game-updater");
   gameUpdaterTitle = document.createElement("h1");
   gameUpdaterTitle.setAttribute("id", "game-updater-title");
-  gameUpdaterTitle.textContent = "Game Updates";
+  gameUpdaterTitle.textContent = "Status Report";
   gameUpdater.appendChild(gameUpdaterTitle);
   gameUpdates = document.createElement("ul");
   gameUpdates.setAttribute("id", "game-updates");
