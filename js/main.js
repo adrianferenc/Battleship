@@ -14,7 +14,7 @@ const other = {
 
 /*----- app's state (variables) -----*/
 let ai,
-buttonBox,
+  buttonBox,
   buttons,
   currentDirection,
   found,
@@ -75,7 +75,7 @@ class Board {
     board.setAttribute("class", "board");
     board.setAttribute("id", `${this.name}-board`);
     for (let i = 0; i < 100; i++) {
-      let newSquare = this.squares[sq(i)]; //THIS IS THE MAJOR PROBLEM.
+      let newSquare = this.squares[numToId(i)]; //THIS IS THE MAJOR PROBLEM.
       let squareDiv = document.createElement("div");
       squareDiv.setAttribute("class", newSquare.class);
       squareDiv.setAttribute("id", newSquare.id);
@@ -85,7 +85,7 @@ class Board {
   }
 
   createSquare(i) {
-    let squareId = sq(i);
+    let squareId = numToId(i);
     let squareObject = new Square(i);
     this.squares[squareId] = squareObject;
     //Updates up, down, upList, and downList
@@ -93,7 +93,7 @@ class Board {
       squareObject.upList.push(squareId);
     }
     if (i >= 10) {
-      let above = sq(i - 10);
+      let above = numToId(i - 10);
       squareObject.up = above;
       squareObject.upList = this.squares[above].upList.concat([squareId]);
       this.squares[above].down = squareId;
@@ -106,7 +106,7 @@ class Board {
       squareObject.leftList.push(squareId);
     }
     if (i % 10 !== 0) {
-      let left = sq(i - 1);
+      let left = numToId(i - 1);
       squareObject.left = left;
       squareObject.leftList = this.squares[left].leftList.concat([squareId]);
       this.squares[left].right = squareId;
@@ -125,35 +125,35 @@ class Shipyard {
         name: "carrier",
         length: 5,
         position: [],
-        class: "ship",
+        class: orientation === 'ship',
         health: 5,
       },
       battleship: {
         name: "battleship",
         length: 4,
         position: [],
-        class: "ship",
+        class: orientation === 'ship',
         health: 4,
       },
       submarine: {
         name: "submarine",
         length: 3,
         position: [],
-        class: "ship",
+        class: orientation === 'ship',
         health: 3,
       },
       cruiser: {
         name: "cruiser",
         length: 3,
         position: [],
-        class: "ship",
+        class: orientation === 'ship',
         health: 3,
       },
       destroyer: {
         name: "destroyer",
         length: 2,
         position: [],
-        class: "ship",
+        class: orientation === 'ship',
         health: 2,
       },
     };
@@ -162,6 +162,10 @@ class Shipyard {
   buildShipyard() {
     let shipyard = document.createElement("div");
     shipyard.setAttribute("id", "shipyard");
+    shipyard.setAttribute(
+      "class",
+      orientation === "leftRight" ? "shipyardRL" : "shipyardUD"
+    );
     for (let ship in this.ships) {
       let shipDiv = this.buildShip(ship);
       shipyard.appendChild(shipDiv);
@@ -191,20 +195,13 @@ function initialize() {
   aiScore = 0;
   orientButton = document.createElement("button");
   buttonBox = document.createElement("div");
-  buttonBox.setAttribute('id','button-box');
+  buttonBox.setAttribute("id", "button-box");
   buttonBox.appendChild(orientButton);
   orientButton.setAttribute("id", "orient-button");
   "Rotate".split("").forEach((letter) => {
     let letterDiv = document.createElement("div");
     letterDiv.textContent = letter;
     orientButton.appendChild(letterDiv);
-  });
-  orientButton.addEventListener("click", () => {
-    orientButton.classList.toggle("rotated-button");
-    orientation === "leftRight"
-      ? (orientation = "upDown")
-      : (orientation = "leftRight");
-    render();
   });
   startButton = document.createElement("button");
   startButton.setAttribute("id", "start-button");
@@ -214,8 +211,8 @@ function initialize() {
     initializeStageTwo();
     render();
   });
-  title = document.createElement('h1');
-  title.textContent = 'Battleship';
+  title = document.createElement("h1");
+  title.textContent = "Battleship";
   mainStage = document.createElement("div");
   mainStage.setAttribute("id", "main-stage");
   startRound();
@@ -223,14 +220,22 @@ function initialize() {
 
 function startRound() {
   document.body.innerHTML = "";
+  orientation = "leftRight";
   player = new Board("player");
   shipyard = new Shipyard();
+  orientButton.addEventListener("click", () => {
+    orientButton.classList.toggle("rotated-button");
+    orientation === "leftRight"
+      ? (orientation = "upDown")
+      : (orientation = "leftRight");
+      
+    render();
+  });
   orientButton.classList.remove("rotated-button");
   for (let i = 0; i < 100; i++) {
     player.createSquare(i);
   }
   placedShips = {};
-  orientation = "leftRight";
   max = {
     id: [],
     max: 0,
@@ -249,17 +254,17 @@ function initializeStageTwo() {
   gameUpdater = document.createElement("div");
   gameUpdater.setAttribute("id", "game-updater");
   gameUpdaterTitle = document.createElement("h1");
-  gameUpdaterTitle.setAttribute('id','game-updater-title');
+  gameUpdaterTitle.setAttribute("id", "game-updater-title");
   gameUpdaterTitle.textContent = "Game Updates";
   gameUpdater.appendChild(gameUpdaterTitle);
   gameUpdates = document.createElement("ul");
-  gameUpdates.setAttribute('id','game-updates')
+  gameUpdates.setAttribute("id", "game-updates");
   gameUpdater.appendChild(gameUpdates);
 
   ai = new Board("ai");
   for (let i = 0; i < 100; i++) {
     ai.createSquare(i);
-    ai.squares[sq(i)].class = "unplayed-square";
+    ai.squares[numToId(i)].class = "unplayed-square";
   }
   placeAIShips();
   turn = 1;
@@ -273,9 +278,26 @@ function render() {
   //This updates the player board, the shipyard, and the ai board
   playerBoard = player.buildBoard();
   if (stage === 1) {
+    if (orientation ==='leftRight'){
+      for (let ship in shipyard.ships){
+        if (!!shipyard.ships[ship].class && shipyard.ships[ship].class.includes('selected-ship')){
+        shipyard.ships[ship].class = 'selected-ship';
+      } else {
+        shipyard.ships[ship].class = 'ship';
+      }
+     }
+     } else if (orientation ==='upDown') {
+      for (let ship in shipyard.ships){
+        if (!!shipyard.ships[ship].class && shipyard.ships[ship].class.includes('selected-ship')){
+          shipyard.ships[ship].class = 'selected-ship-rotated';
+        } else {
+          shipyard.ships[ship].class = 'ship-rotated';
+        }
+      }
+      }
+    shipyardDisplay = shipyard.buildShipyard();
     playerBoard.addEventListener("click", placeAShip);
     mainStage.appendChild(playerBoard);
-    shipyardDisplay = shipyard.buildShipyard();
     mainStage.appendChild(buttonBox);
     mainStage.appendChild(shipyardDisplay);
     startButton.disabled = Object.keys(player.ships).length < 5;
@@ -305,7 +327,7 @@ function render() {
     let playAgainStatement = document.createElement("h2");
     playAgainStatement.textContent = "Would you like to play again?";
     let playAgainButton = document.createElement("button");
-    playAgainButton.setAttribute('id','play-again-button')
+    playAgainButton.setAttribute("id", "play-again-button");
     playAgainButton.textContent = "Play Again";
     playAgainButton.addEventListener("click", () => startRound());
     winnerBox.appendChild(winningStatement);
@@ -329,11 +351,11 @@ function getWinner() {
   }
 }
 
-function sq(i) {
+function numToId(i) {
   return `square-${i}`;
 }
 
-function unsquare(id) {
+function idToNum(id) {
   return parseInt(id.split("-")[1]);
 }
 
@@ -344,7 +366,7 @@ function isPlaceable(ship, i, side, orientation) {
       for (let j = 0; j < length; j++) {
         if (
           i + j >= 100 ||
-          side.squares[sq(i + j)].occupied ||
+          side.squares[numToId(i + j)].occupied ||
           (i + j) % 10 < i % 10
         ) {
           return false;
@@ -353,7 +375,7 @@ function isPlaceable(ship, i, side, orientation) {
       return true;
     } else {
       for (let j = 0; j < length; j++) {
-        if (i + 10 * j >= 100 || side.squares[sq(i + 10 * j)].occupied) {
+        if (i + 10 * j >= 100 || side.squares[numToId(i + 10 * j)].occupied) {
           return false;
         }
       }
@@ -363,21 +385,21 @@ function isPlaceable(ship, i, side, orientation) {
 }
 
 function placeAShip(e) {
-  let i = unsquare(e.target.id);
+  let i = idToNum(e.target.id);
   if (selectedShip && e.target.className === "square") {
     let length = shipyard.ships[selectedShip].length;
     if (selectedShip && isPlaceable(selectedShip, i, player, orientation)) {
       if (orientation === "leftRight") {
         for (let j = 0; j < length; j++) {
-          player.squares[sq(i + j)].occupied = true;
+          player.squares[numToId(i + j)].occupied = true;
           shipyard.ships[selectedShip].position.push(i + j);
-          player.squares[sq(i + j)].class = "occupied-square";
+          player.squares[numToId(i + j)].class = "occupied-square";
         }
       } else {
         for (let j = 0; j < length; j++) {
-          player.squares[sq(i + 10 * j)].occupied = true;
+          player.squares[numToId(i + 10 * j)].occupied = true;
           shipyard.ships[selectedShip].position.push(i + 10 * j);
-          player.squares[sq(i + 10 * j)].class = "occupied-square";
+          player.squares[numToId(i + 10 * j)].class = "occupied-square";
         }
       }
       player.ships[selectedShip] = shipyard.ships[selectedShip];
@@ -398,12 +420,12 @@ function placeAIShips() {
     let length = aiShipyard.ships[ship].length;
     if (randomOrientation === "leftRight") {
       for (let j = 0; j < length; j++) {
-        ai.squares[sq(randomSquare + j)].occupied = true;
+        ai.squares[numToId(randomSquare + j)].occupied = true;
         aiShipyard.ships[ship].position.push(randomSquare + j);
       }
     } else {
       for (let j = 0; j < length; j++) {
-        ai.squares[sq(randomSquare + 10 * j)].occupied = true;
+        ai.squares[numToId(randomSquare + 10 * j)].occupied = true;
         aiShipyard.ships[ship].position.push(randomSquare + 10 * j);
       }
     }
@@ -413,10 +435,12 @@ function placeAIShips() {
 
 function selectAShip(e) {
   if (selectedShip) {
-    shipyard.ships[selectedShip].class = "ship";
-  }
+    shipyard.ships[selectedShip].class =
+      orientation === "leftRight" ? "ship" : "ship-rotated";
+  } 
   selectedShip = e.target.id.split("-")[0];
-  shipyard.ships[selectedShip].class = "selected-ship";
+  shipyard.ships[selectedShip].class =
+    orientation === "leftRight" ? "selected-ship" : "selected-ship-rotated";
   render();
 }
 
@@ -429,7 +453,7 @@ function attackASquare(e) {
         winner = getWinner();
         render();
         if (!winner) {
-          setTimeout(AIAttacks,1000);
+          setTimeout(AIAttacks, 1000);
         }
       }
     }
@@ -437,25 +461,27 @@ function attackASquare(e) {
 }
 
 function updateSquares(side, square) {
-  let i = unsquare(square);
+  let i = idToNum(square);
   //update left, right, up, down:
   if (i % 10 !== 0) {
-    side.squares[sq(i - 1)].right = null;
+    side.squares[numToId(i - 1)].right = null;
   }
   if (i % 10 !== 9) {
-    side.squares[sq(i + 1)].left = null;
+    side.squares[numToId(i + 1)].left = null;
   }
   if (i >= 10) {
-    side.squares[sq(i - 10)].down = null;
+    side.squares[numToId(i - 10)].down = null;
   }
   if (i < 90) {
-    side.squares[sq(i + 10)].up = null;
+    side.squares[numToId(i + 10)].up = null;
   }
   //update lists
   for (let j = 0; (10 + i - j) % 10 <= i % 10; j++) {
-    side.squares[sq(i - j)].rightList = side.squares[sq(i - j)].rightList.slice(
+    side.squares[numToId(i - j)].rightList = side.squares[
+      numToId(i - j)
+    ].rightList.slice(
       0,
-      side.squares[sq(i - j)].rightList.indexOf(square)
+      side.squares[numToId(i - j)].rightList.indexOf(square)
     );
     if ((i - j) % 10 === 0 && j > 0) {
       break;
@@ -463,58 +489,63 @@ function updateSquares(side, square) {
   }
 
   for (let j = 0; i % 10 <= (i + j) % 10 && i + j < 100; j++) {
-    side.squares[sq(i + j)].leftList = side.squares[sq(i + j)].leftList.slice(
-      side.squares[sq(i + j)].leftList.indexOf(square) + 1
-    );
+    side.squares[numToId(i + j)].leftList = side.squares[
+      numToId(i + j)
+    ].leftList.slice(side.squares[numToId(i + j)].leftList.indexOf(square) + 1);
     if ((i + j) % 10 === 0 && j > 0) {
       break;
     }
   }
 
   for (let j = 0; i - 10 * j >= 0; j++) {
-    side.squares[sq(i - 10 * j)].downList = side.squares[
-      sq(i - 10 * j)
-    ].downList.slice(0, side.squares[sq(i - 10 * j)].downList.indexOf(square));
+    side.squares[numToId(i - 10 * j)].downList = side.squares[
+      numToId(i - 10 * j)
+    ].downList.slice(
+      0,
+      side.squares[numToId(i - 10 * j)].downList.indexOf(square)
+    );
     if (i - 10 * j < 10) {
       break;
     }
   }
   for (let j = 0; i + 10 * j < 100; j++) {
-    side.squares[sq(i + 10 * j)].upList = side.squares[
-      sq(i + 10 * j)
-    ].upList.slice(side.squares[sq(i + 10 * j)].upList.indexOf(square) + 1);
+    side.squares[numToId(i + 10 * j)].upList = side.squares[
+      numToId(i + 10 * j)
+    ].upList.slice(
+      side.squares[numToId(i + 10 * j)].upList.indexOf(square) + 1
+    );
   }
 }
 
 function stabInTheDark() {
   for (let i = 0; i < 100; i++) {
     let total =
-      Math.min(player.squares[sq(i)].leftList.length, 5) +
-      Math.min(player.squares[sq(i)].rightList.length, 5) +
-      Math.min(player.squares[sq(i)].downList.length, 5) +
-      Math.min(player.squares[sq(i)].upList.length, 5);
+      Math.min(player.squares[numToId(i)].leftList.length, 5) +
+      Math.min(player.squares[numToId(i)].rightList.length, 5) +
+      Math.min(player.squares[numToId(i)].downList.length, 5) +
+      Math.min(player.squares[numToId(i)].upList.length, 5);
     if (total > max.max) {
       max.max = total;
     }
   }
   for (let i = 0; i < 100; i++) {
     let total =
-      Math.min(player.squares[sq(i)].leftList.length, 5) +
-      Math.min(player.squares[sq(i)].rightList.length, 5) +
-      Math.min(player.squares[sq(i)].downList.length, 5) +
-      Math.min(player.squares[sq(i)].upList.length, 5);
+      Math.min(player.squares[numToId(i)].leftList.length, 5) +
+      Math.min(player.squares[numToId(i)].rightList.length, 5) +
+      Math.min(player.squares[numToId(i)].downList.length, 5) +
+      Math.min(player.squares[numToId(i)].upList.length, 5);
     if (total === max.max) {
-      max.id.push(sq(i));
+      max.id.push(numToId(i));
     }
   }
   return max.id[Math.floor(Math.random() * max.id.length)];
 }
 
 function feelingAround() {
-  let leftOfFound = sq(unsquare(found[found.length - 1]) - 1);
-  let rightOfFound = sq(unsquare(found[found.length - 1]) + 1);
-  let upOfFound = sq(unsquare(found[found.length - 1]) - 10);
-  let downOfFound = sq(unsquare(found[found.length - 1]) + 10);
+  let leftOfFound = numToId(idToNum(found[found.length - 1]) - 1);
+  let rightOfFound = numToId(idToNum(found[found.length - 1]) + 1);
+  let upOfFound = numToId(idToNum(found[found.length - 1]) - 10);
+  let downOfFound = numToId(idToNum(found[found.length - 1]) + 10);
   let foundDirection = [
     [
       (x) => x - 1,
@@ -548,10 +579,10 @@ function AIAttacks() {
     if (found.length === 0) {
       checkHit(player, stabInTheDark());
     } else if (found.length === 2) {
-      checkHit(player, sq(currentDirection(unsquare(found[1]))));
+      checkHit(player, numToId(currentDirection(idToNum(found[1]))));
     } else {
       feelingAround();
-      checkHit(player, sq(currentDirection(unsquare(found[0]))));
+      checkHit(player, numToId(currentDirection(idToNum(found[0]))));
     }
     turn++;
     max = { max: 0, id: [] };
@@ -576,7 +607,7 @@ function checkHit(side, square) {
       }
     }
     for (let ship in side.ships) {
-      if (side.ships[ship].position.includes(unsquare(square))) {
+      if (side.ships[ship].position.includes(idToNum(square))) {
         side.ships[ship].health--;
         if (side.ships[ship].health === 0) {
           sinkShip(ship, side);
@@ -602,7 +633,7 @@ function checkHit(side, square) {
 
 function sinkShip(ship, side) {
   for (let id of side.ships[ship].position) {
-    side.squares[sq(id)].class = "sunk-square";
+    side.squares[numToId(id)].class = "sunk-square";
   }
   update = document.createElement("li");
   update.style.fontSize = "20pt";
