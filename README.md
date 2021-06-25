@@ -29,7 +29,7 @@ The game can be played [here.](https://adrianferenc.github.io/Battleship/)
 - Once the game starts, click any square on the AI's board (the board on the right). A miss will show up as <span style="color:goldenrod"> goldenrod</span> and a hit shows up as <span style="color:red"> red</span>. When a ship is sunk, it shows up as <span style="color:navy"> navy</span>.
 
 # How The Game Is Played:
-In this game, you play battleship against an AI. The game works in 2 main stages. The first stage is where you place your 5 ships onto the 10x10 grid. In the second stage, each player (you & AI) go back and forth picking squares on the grid where each believe their opponent has put a ship. When an entire ship is sunk, the other player is alerted. The game proceeds until one player's ships are all sunk, at which point the other player wins.
+In this game, you play battleship against an AI. The game works in 2 main stages. In the first stage, you place 5 ships onto the 10x10 grid. In the second stage, each player (you & AI) go back and forth picking squares on the grid where each believe their opponent has put a ship. When an entire ship is sunk, the other player is alerted. The game proceeds until one player's ships are all sunk, at which point the other player wins.
 
 
 
