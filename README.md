@@ -1,8 +1,8 @@
 # Battleship
 
-The game of Battleship was originally a game played with paper and pencil. It dates back to World War I, where it is questionably disputed if it was created by the French or the Russions.
+The game of Battleship was originally played with paper and pencil. It dates back to World War I, where it is there is some dispute as to whether it was created by the French or the Russians. Since, it has become a board game (Battleship, Milton Bradley 1967) and an electronic board game (Electronic Battleship, Milton Bradley 1977).
 
-In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor Kitsch, Alexander Skarsgård, Rihanna, Brooklyn Decker, Tadanobu Asano, and Liam Neeson. It has a 34% rating on Rotten Tomatoes. Some _fun_ facts about the film (via IMDb):
+In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor Kitsch, Alexander Skarsgård, Rihanna, Brooklyn Decker, Tadanobu Asano, and Liam Neeson. It has a 34% rating on Rotten Tomatoes. Some _fun_ facts about the film (via [IMDb](https://www.imdb.com)):
 
 - The film utilized 600 extras.
 - The film was originally set to be filmed off Australia's Gold Coast. Due to problems with government tax incentives, filming moved to Hawaii.
@@ -39,6 +39,7 @@ In this game, you play battleship against an AI. The game works in 2 main stages
 
 
 ## Next Steps
+- Fix a bug that occurs sometimes when the AI hits multiple ships without sinking any. Eventually the AI just keeps attacking the same square.
 - Shows a "shadow" of a ship where your mouse is hovering when you're placing a ship so you know where it will go.
 - Put outlines around the outside of the ships once placed on the board (using border-top-style, border-left-style, etc.)
 - In stage 1, clicking on a ship that has already been placed will remove it from the board and put it back at the top of the shipyard.
