@@ -35,6 +35,7 @@ In this game, you play battleship against an AI. The game works in 2 main stages
 
 
 ## Next Steps
+- Shows a "shadow" of a ship where your mouse is hovering when you're placing a ship so you know where it will go.
 - Put outlines around the outside of the ships once placed on the board (using border-top-style, border-left-style, etc.)
 - In stage 1, clicking on a ship that has already been placed will remove it from the board and put it back at the top of the shipyard.
 

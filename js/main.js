@@ -340,11 +340,13 @@ function render() {
 
 function getWinner() {
   if (ai.remainingShips === 0) {
+    setTimeout(()=>, 3000);
     stage = 3;
     playerScore++;
     return "You won!";
   }
   if (player.remainingShips === 0) {
+    setTimeout(()=>, 3000);
     stage = 3;
     aiScore++;
     return "The AI won! &#129302;";
