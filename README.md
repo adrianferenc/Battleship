@@ -9,7 +9,7 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 - Jeremy Renner was cast as Alex Hopper, but dropped out to co-star in The Master (2012), of which he also dropped out.
 - The spectrum analyzer used to get the transmission through is an Anritsu MS2713E Spectrum Master.
 
-##Screenshots of the game
+## Screenshots of the game
 <img width="1440" alt="start screen" src="https://user-images.githubusercontent.com/68762863/123341110-41788380-d502-11eb-9e43-228dceaa4de6.png">
 
 <img width="1440" alt="placed ships" src="https://user-images.githubusercontent.com/68762863/123341159-58b77100-d502-11eb-8bbc-04b98c5868d2.png">
