@@ -1,6 +1,6 @@
 # Battleship
 
-The game of Battleship was originally played with paper and pencil. It dates back to World War I, where it is there is some dispute as to whether it was created by the French or the Russians. Since, it has become a board game (Battleship, Milton Bradley 1967) and an electronic board game (Electronic Battleship, Milton Bradley 1977).
+The game of Battleship was originally played with paper and pencil. It dates back to World War I, where there is some dispute as to whether it was created by the French or the Russians. Since, it has become a board game (Battleship, Milton Bradley 1967) and an electronic board game (Electronic Battleship, Milton Bradley 1977).
 
 In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor Kitsch, Alexander Skarsgård, Rihanna, Brooklyn Decker, Tadanobu Asano, and Liam Neeson. It has a 34% rating on Rotten Tomatoes. Some _fun_ facts about the film (via [IMDb](https://www.imdb.com)):
 
