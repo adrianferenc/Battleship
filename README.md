@@ -21,7 +21,7 @@ In 2012, the film Battleship (a movie I have not seen) came out, starring Taylor
 
 ## Technologies Used:
 
-The game Battleship was created with HTML, CSS, and Javascript.
+Battleship was created with HTML, CSS, and Javascript.
 
 ## Getting Started
 The game can be played [here.](https://adrianferenc.github.io/Battleship/)
