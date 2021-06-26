@@ -304,7 +304,10 @@ function render() {
     startButton.disabled = Object.keys(player.ships).length < 5;
     stageOne.appendChild(title);
     stageOne.appendChild(mainStage);
-    stageOne.appendChild(startButton);
+    let startBox = document.createElement('div');
+    startBox.setAttribute('id','start-box')
+    startBox.appendChild(startButton);
+    stageOne.appendChild(startBox);
     document.body.appendChild(stageOne);
   } else if (stage === 2) {
     stageOne.innerHTML = "";
