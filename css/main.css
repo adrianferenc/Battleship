@@ -3,6 +3,7 @@
 body {
   font-family: "Share Tech Mono", monospace;
   background-color: #41b3a3;
+  scrollbar-color: gray royalblue;
 }
 
 button {
